@@ -17,7 +17,9 @@ function setup() {
   selection.option('Tim Sort');
   selection.option('Radix Sort');
   selection.option('Insertion Sort');
+  selection.option('Heap Sort');
   selection.selected('Quick Sort');
+
   
 
   runButton = createButton("Start")
@@ -48,6 +50,9 @@ function makeVals(){
 }
 
 function Run() {
+  if (values.length % 2 != 0){
+    values.splice(values.length-1, 1)
+  }
   let item = selection.value();
   if (canRun){
     canRun = false
@@ -68,6 +73,11 @@ function Run() {
       insertionSortRecursive(values, values.length-1)
 
     }
+    if (item == "Heap Sort"){
+      heapSort(values, values.length)
+
+    }
+
   }
 
 }
@@ -85,6 +95,7 @@ function draw() {
       fill(255);
     }
     rect(i * w, height - values[i], w, values[i]);
+    states[i] = -1
   }
 
 }
