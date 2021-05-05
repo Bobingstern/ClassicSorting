@@ -276,7 +276,9 @@ async function radixSort(arr){
 
 //Recursive Insetrtion
 async function insertionSortRecursive(arr, n)
-{
+{   for (var i=0;i<states.length;i++){
+      states[i] = -1
+    }
     // Base case
     if (n <= 1)
         return;
@@ -293,7 +295,9 @@ async function insertionSortRecursive(arr, n)
       greater than key, to one position ahead
       of their current position */
     while (j >= 0 && arr[j] > last)
-    {
+    {   states[j+1] = 1
+        await sleep(delay)
+        states[j+1] = -1
         arr[j+1] = arr[j];
         j--;
     }
