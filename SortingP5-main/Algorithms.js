@@ -3,7 +3,11 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 async function swap(arr, a, b) {
-  await sleep(1);
+  states[a] = 1
+  states[b] = 1
+  await sleep(delay);
+  states[a] = -1
+  states[b] = -1
   let temp = arr[a];
   arr[a] = arr[b];
   arr[b] = temp;
@@ -20,9 +24,27 @@ async function merge(arr, l, m, r){
 
   for (var x=0;x<n1;x++){
     L.push(arr[l+x])
+    
+    
   }
   for (var y=0;y<n2;y++){
     R.push(arr[m+1+y])
+    
+  }
+  x = 0
+  y = 0
+  while (y < n2 || x < n1){
+    if (y < n2){
+      y++
+    }
+    if (x < n1){
+      x++
+    }
+    states[m+1+y] = 1
+    states[l+x] = 1
+    await sleep(delay)
+    states[m+1+y] = -1
+    states[l+x] = -1
   }
 
   let i=0
@@ -42,27 +64,27 @@ async function merge(arr, l, m, r){
 
             j++;
         }
+        await sleep(delay)
         states[k] = -1
-        await sleep(1)
         k++;
 
     }
 
     while (i < n1) {
         arr[k] = L[i];
-        //await sleep(1)
+        await sleep(1)
         i++;
         k++;
-        states[k] = -1
+        states[k] = 1
 
     }
 
     while (j < n2) {
         arr[k] = R[j];
-        //await sleep(1)
+        await sleep(1)
         j++;
         k++;
-        states[k] = -1
+        states[k] = 1
     }
 
 }
@@ -84,6 +106,9 @@ async function mergeSort(arr, l, r){
 
 //Quick Sort
 async function quickSort(arr, start, end) {
+  for (var n=0;n<states.length;n++){
+      states[n] = -1
+    }
   if (start >= end) {
     return;
   }
@@ -123,6 +148,7 @@ async function partition(arr, low, high) {
     await swap(arr, i, j)
 
 
+
   }
 
 
@@ -147,7 +173,7 @@ async function insertionSort(arr, left, right)
             j--;
         }
         arr[j+1] = temp;
-        await sleep(1)
+        await sleep(delay)
     }
 }
 
@@ -229,7 +255,7 @@ async function countingSort(arr, size, place){
   for (let i = 0; i < size; i++){
     states[i] = 1
     arr[i] = output[i];
-    await sleep(0.01)
+    await sleep(delay)
     states[i] = -1
   }
 }
@@ -272,7 +298,7 @@ async function insertionSortRecursive(arr, n)
         j--;
     }
     arr[j+1] = last;
-    await sleep(1)
+    await sleep(delay)
 }
 //---
 
@@ -323,7 +349,121 @@ async function heapSort(arr, n)
     }
 }
 
-///-----
+///-----Shell sort
+
+async function ShellSort(arr, n){
+  // Start with a big gap, then reduce the gap
+    for (var gap = floor(n/2); gap > 0; gap = floor(gap/2))
+    {
+        // Do a gapped insertion sort for this gap size.
+        // The first gap elements a[0..gap-1] are already in gapped order
+        // keep adding one more element until the entire array is
+        // gap sorted 
+        for (var i = gap; i < n; i += 1)
+        {
+            // add a[i] to the elements that have been gap sorted
+            // save a[i] in temp and make a hole at position i
+            var temp = arr[i];
+            states[i] = 1
+  
+            // shift earlier gap-sorted elements up until the correct 
+            // location for a[i] is found
+            var j;            
+            for (j = i; j >= gap && arr[j - gap] > temp; j -= gap){
+              arr[j] = arr[j - gap];
+              //await sleep(1)
+            }
+              
+            //  put temp (the original a[i]) in its correct location
+            arr[j] = temp;
+            states[j] = 1
+            await sleep(delay)
+            states[j] = -1
+            states[i] = -1
+        }
+    }
+}
+
+
+///Comb sort
+function is_array_sorted(arr) {
+      var sorted = true;
+      for (var i = 0; i < arr.length - 1; i++) {
+          if (arr[i] > arr[i + 1]) {
+              sorted = false;
+              break;
+          }
+      }
+      return sorted;
+  }
+async function combSort(arr)
+{
+ 
+ 
+  var iteration_count = 0;
+  var gap = arr.length - 2;
+  var decrease_factor = 1.25;
+ 
+  // Repeat iterations Until array is not sorted
+  
+  while (!is_array_sorted(arr)) 
+  {
+      // If not first gap  Calculate gap
+      if (iteration_count > 0)
+         gap = (gap == 1) ? gap : Math.floor(gap / decrease_factor);
+ 
+  // Set front and back elements and increment to a gap
+      var front = 0;
+      var back = gap;
+      while (back <= arr.length - 1) 
+      {
+          // Swap the elements if they are not ordered
+        
+          if (arr[front] > arr[back])
+          {
+              var temp = arr[front];
+              arr[front] = arr[back];
+              states[front] = 1
+              await sleep(delay)
+              states[front] = -1
+              states[back] = 1
+              arr[back] = temp;
+              await sleep(delay)
+              states[back] = -1
+          }
+ 
+          // Increment and re-run swapping
+        
+          front += 1;
+          back += 1;
+      }
+      iteration_count += 1;
+  }
+}
+
+
+///Introsort
+
+
+async function InsertionSort(arr, begin, end){
+  let left = begin - arr
+  let right = end - arr
+
+  for (var i=left+1;i<=right;i++){
+    let key = arr[i]
+    let j = i-1
+
+    while (j >= left && arr[j] > key)
+        {
+            arr[j+1] = arr[j];
+            j = j-1;
+        }
+        arr[j+1] = key;
+  }
+}
+
+
+
 
 
 
