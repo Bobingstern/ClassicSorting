@@ -16,7 +16,7 @@ var osc
 
 
 function mousePressed(){
-  userStartAudio();
+  
 }
 
 function setup() {
@@ -104,6 +104,7 @@ function makeVals(){
 }
 
 function Run() {
+  userStartAudio();
   if (values.length % 2 != 0){
     values.splice(values.length-1, 1)
   }
