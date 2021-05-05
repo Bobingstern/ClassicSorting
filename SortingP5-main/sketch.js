@@ -161,9 +161,10 @@ function draw() {
     if (states[i] == 0) {
       fill('#E0777D');
     } else if (states[i] == 1) {
-      let key = round(map(values[i], 1, height, 1, 81))
-      console.log(key)
-      playNote(key)  
+      let key = (map(values[i], 1, height, 1, 41))
+      console.log(key+40)
+      playNote(key+40)  
+
       fill(255, 0, 0);
     } else {
       fill(255);
