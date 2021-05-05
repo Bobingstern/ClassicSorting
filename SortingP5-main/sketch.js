@@ -28,6 +28,7 @@ function setup() {
   osc.start();
   osc.amp(0);
 
+
   selection = createSelect();
   selection.position(10, 10);
   selection.option('Quick Sort');
@@ -104,10 +105,10 @@ function makeVals(){
 }
 
 function Run() {
-  userStartAudio();
   if (values.length % 2 != 0){
     values.splice(values.length-1, 1)
   }
+  userStartAudio();
   let item = selection.value();
   if (canRun){
     canRun = false
@@ -160,8 +161,9 @@ function draw() {
     if (states[i] == 0) {
       fill('#E0777D');
     } else if (states[i] == 1) {
-      let key = (values[i] * 71)/height
-      playNote(round(key))  
+      let key = round(map(values[i], 1, height, 1, 81))
+      console.log(key)
+      playNote(key)  
       fill(255, 0, 0);
     } else {
       fill(255);
