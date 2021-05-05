@@ -95,6 +95,9 @@ function getBaseLog(x, y) {
 
 function makeVals(){
   canRun = true
+  for (var i=0;i<states.length;i++){
+      states[i] = -1
+    }
   values = new Array(floor(width/w));
   for (let i = 0; i < values.length; i++) {
     values[i] = round(i*height/values.length)
@@ -107,7 +110,9 @@ function makeVals(){
 function Run() {
   if (values.length % 2 != 0){
     values.splice(values.length-1, 1)
-  }
+  }for (var i=0;i<states.length;i++){
+      states[i] = -1
+    }
   userStartAudio();
   let item = selection.value();
   if (canRun){
