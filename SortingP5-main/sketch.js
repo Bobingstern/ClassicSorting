@@ -11,8 +11,8 @@ let delay = 1
 let delUp
 let delDown
 var osc
-
-
+let sorted
+let shuffType
 
 
 function mousePressed(){
@@ -22,7 +22,7 @@ function mousePressed(){
 function setup() {
   // put setup code here
   createCanvas(window.innerWidth, window.innerHeight);
-  makeVals()
+  
   osc = new p5.TriOsc();
   // Start silent
   osc.start();
@@ -33,14 +33,24 @@ function setup() {
   selection.position(10, 10);
   selection.option('Quick Sort');
   selection.option('Merge Sort');
-  selection.option('Tim Sort');
+  //selection.option('Tim Sort');
   selection.option('Radix Sort');
-  selection.option('Insertion Sort');
+  
+  //selection.option('Insertion Sort');
   selection.option('Heap Sort');
   selection.option('Shell Sort');
   selection.option('Comb Sort');
   //selection.option('IntroSort');
   selection.selected('Quick Sort');
+
+
+  shuffType = createSelect();
+  shuffType.position(120, 10);
+  shuffType.option('Normal Shuffle');
+  shuffType.option('Reverse Shuffle');
+  shuffType.option("Heapifyed Shuffle")
+  shuffType.option("Almost Sorted")
+  shuffType.selected('Normal Shuffle');
 
   
 
@@ -51,11 +61,11 @@ function setup() {
   upButton = createButton("+")
   upButton.position(100, 30)
   upButton.mousePressed(function(){w = round(w/1.5)
-                                  makeVals()})
+                                  makeSort()})
   downButton = createButton("-")
   downButton.position(70, 30)
   downButton.mousePressed(function(){w = round(w*1.5)
-                                  makeVals()})
+                                  makeSort()})
 
   delUp = createButton("+Delay")
   delUp.position(130, 60)
@@ -69,7 +79,7 @@ function setup() {
   shuff.position(130, 30)
   shuff.mousePressed(makeVals)
   
-
+  makeVals()
 }
 
 
@@ -87,30 +97,109 @@ function playNote(note, duration) {
   }
 }
 
-
+function makeSort(){
+  for (var i=0;i<states.length;i++){
+        states[i] = -1
+      }
+    values = new Array(floor(width/w));
+    for (let i = 0; i < values.length; i++) {
+      values[i] = round(i*height/values.length)
+      //values[i] = height-i*height/values.length
+      states[i] = -1;
+    }
+    //shuffleArr(values)
+    values = shuffle(values)
+}
 
 function getBaseLog(x, y) {
   return log(y) / log(x);
 }
+async function shuffleArr(arr, e, x){
+  if (!x){
+    for (var i=0;i<e;i++){
+      let a = i
+      let b = round(random(0, arr.length-1))
+      states[a] = 1
+      states[b] = 1
+      if (i % 3 == 0){
+      await sleep(1);
+      }
+      states[a] = -1
+      states[b] = -1
+      let temp = arr[i];
+      arr[a] = arr[b];
+      arr[b] = temp;
+    }
+  }
+  if (x){
+    for (var i=0;i<e;i++){
+        let a = round(random(0, arr.length-1))
+        let b = round(random(0, arr.length-1))
+        if (a != b){
+          states[a] = 1
+          states[b] = 1
+          if (i % 3 == 0){
+          await sleep(1);
+          }
+          states[a] = -1
+          states[b] = -1
+          let temp = arr[a];
+          arr[a] = arr[b];
+          arr[b] = temp;
+        }
+      }
+  }
+}
 
-function makeVals(){
+async function makeVals(){
   canRun = true
   for (var i=0;i<states.length;i++){
       states[i] = -1
     }
-  values = new Array(floor(width/w));
-  for (let i = 0; i < values.length; i++) {
-    values[i] = round(i*height/values.length)
-    //values[i] = height-i*height/values.length
-    states[i] = -1;
+  osc.fade(0, 0.1)
+  let item = shuffType.value()
+  for (var i=0;i<states.length;i++){
+        states[i] = -1
+      }
+    values = new Array(floor(width/w));
+    for (let i = 0; i < values.length; i++) {
+      values[i] = round(i*height/values.length)
+      //values[i] = height-i*height/values.length
+      states[i] = -1;
+    }
+
+    if (values.length % 2 != 0){
+    values.splice(values.length-1, 1)
   }
-  values = shuffle(values)
+
+  if (item == "Reverse Shuffle"){
+    
+    values = values.reverse()
+  }
+
+  if (item == "Normal Shuffle"){
+    shuffleArr(values, values.length, false)
+  }
+
+  if (item == "Heapifyed Shuffle"){
+    let n = values.length
+    for (let i = n / 2 - 1; i >= 0; i--){
+        heapify(values, n, i);
+        await sleep(1)
+
+    }
+  }
+  if (item == "Almost Sorted"){
+    shuffleArr(values, round(values.length/10), true)
+  }
+  osc.fade(0, 0.1)
 }
 
 function Run() {
   if (values.length % 2 != 0){
     values.splice(values.length-1, 1)
-  }for (var i=0;i<states.length;i++){
+  }
+  for (var i=0;i<states.length;i++){
       states[i] = -1
     }
   userStartAudio();
@@ -167,7 +256,6 @@ function draw() {
       fill('#E0777D');
     } else if (states[i] == 1) {
       let key = (map(values[i], 1, height, 1, 41))
-      console.log(key+40)
       playNote(key+40)  
 
       fill(255, 0, 0);
