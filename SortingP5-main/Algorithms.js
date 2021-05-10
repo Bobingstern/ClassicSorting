@@ -6,8 +6,6 @@ async function swap(arr, a, b) {
   states[a] = 1
   states[b] = 1
   await sleep(delay);
-  states[a] = -1
-  states[b] = -1
   let temp = arr[a];
   arr[a] = arr[b];
   arr[b] = temp;
@@ -43,8 +41,7 @@ async function merge(arr, l, m, r){
     states[m+1+y] = 1
     states[l+x] = 1
     await sleep(delay)
-    states[m+1+y] = -1
-    states[l+x] = -1
+
   }
 
   let i=0
@@ -65,7 +62,6 @@ async function merge(arr, l, m, r){
             j++;
         }
         await sleep(delay)
-        states[k] = -1
         k++;
 
     }
@@ -106,14 +102,12 @@ async function mergeSort(arr, l, r){
 
 //Quick Sort
 async function quickSort(arr, start, end) {
-  for (var n=0;n<states.length;n++){
-      states[n] = -1
-    }
+
   if (start >= end) {
     return;
   }
   let index = await partition(arr, start, end);
-  states[index] = -1;
+  //states[index] = -1;
 
   // Promise.all([quickSort(arr, start, index), quickSort(arr, index + 1, end)])
   await quickSort(arr, start, index)
@@ -128,9 +122,7 @@ async function partition(arr, low, high) {
 
 
   while (true){
-    for (var n=0;n<states.length;n++){
-      states[n] = -1
-    }
+    
     states[i] = 1;
     states[j] = 1;
     i++
@@ -283,7 +275,6 @@ async function countingSort(arr, size, place){
     if (i%2 == 0){
       await sleep(delay)
     }
-    states[i] = -1
   }
 
   
@@ -306,9 +297,7 @@ async function radixSort(arr){
 
 //Recursive Insetrtion
 async function insertionSortRecursive(arr, n)
-{   for (var i=0;i<states.length;i++){
-      states[i] = -1
-    }
+{   
     // Base case
     if (n <= 1)
         return;
@@ -327,7 +316,6 @@ async function insertionSortRecursive(arr, n)
     while (j >= 0 && arr[j] > last)
     {   states[j+1] = 1
         await sleep(delay)
-        states[j+1] = -1
         arr[j+1] = arr[j];
         j--;
     }
@@ -412,8 +400,7 @@ async function ShellSort(arr, n){
             arr[j] = temp;
             states[j] = 1
             await sleep(delay)
-            states[j] = -1
-            states[i] = -1
+
         }
     }
 }
@@ -459,11 +446,9 @@ async function combSort(arr)
               arr[front] = arr[back];
               states[front] = 1
               await sleep(delay)
-              states[front] = -1
               states[back] = 1
               arr[back] = temp;
               await sleep(delay)
-              states[back] = -1
           }
  
           // Increment and re-run swapping
@@ -477,125 +462,150 @@ async function combSort(arr)
 
 
 ///Introsort
-function InsertionSort(arr, begin, end)
-{
-    // Get the left and the right index of the subarray
-    // to be sorted
-    let left = begin - arr;
-    let right = end - arr;
-  
-    for (let i = left+1; i <= right; i++)
-    {
-        let key = arr[i];
-        let j = i-1;
-  
-       /* Move elements of arr[0..i-1], that are
-          greater than key, to one position ahead
-          of their current position */
-        while (j >= left && arr[j] > key)
-        {
-            arr[j+1] = arr[j];
-            j = j-1;
-        }
-        arr[j+1] = key;
-   }
-  
-}
-  
-// A function to partition the array and return
-// the partition point
-async function Partition(arr, low, high)
-{
-    let pivot = arr[high];    // pivot
-    let i = (low - 1);  // Index of smaller element
-  
-    for (let j = low; j <= high- 1; j++)
-    {
-        // If current element is smaller than or
-        // equal to pivot
-        if (arr[j] <= pivot)
-        {
-            // increment index of smaller element
-            i++;
-  
-            await swap(arr, i, j);
-        }
+
+//Merge sort in place
+
+async function insertSort(arr, l, h){
+  let tmp
+  let loc
+  for (var i=l+1;i<h;i++){
+    tmp = arr[i]
+    loc = i-1
+    while (loc >= l){
+      if (arr[loc] > tmp){
+        await swap(arr, loc, loc+1)
+      }
+      else{
+        break
+      }
+      loc--
     }
-    await swap(arr, i+1, high);
-    return (arr + i + 1);
+  }
 }
-  
-  
-// A function that find the middle of the
-// values pointed by the pointers a, b, c
-// and return that pointer
-function MedianOfThree(a, b, c)
-{
-    if (a < b && b < c)
-        return (b);
-  
-    if ( a <  c &&  c <= b)
-        return (c);
-  
-    if (b <= a && a < c)
-        return (a);
-  
-    if (b < c && c <= a)
-        return (c);
-  
-    if (c <= a && a < b)
-        return (a);
-  
-    if (c <= b && b <= a)
-        return (b);
-}
-  
-// A Utility function to perform intro sort
-async function IntrosortUtil(arr, begin,
-                  end, depthLimit)
-{
-    // Count the number of elements
-    let size = end - begin;
-  
-      // If partition size is low then do insertion sort
-    if (size < 16)
-    {
-        InsertionSort(arr, begin, end);
-        return;
-    }
-  
-    // If the depth is zero use heapsort
-    if (depthLimit == 0)
-    {
-        make_heap(begin, end+1);
-        sort_heap(begin, end+1);
-        return;
-    }
-  
-    // Else use a median-of-three concept to
-    // find a good pivot
-    let pivot = MedianOfThree(begin, begin+size/2, end);
-  
-    // Swap the values pointed by the two pointers
-    await swap(arr, pivot, end);
-  
-   // Perform Quick Sort
-    let partitionPoint = Partition(arr, begin-arr, end-arr);
-    IntrosortUtil(arr, begin, partitionPoint-1, depthLimit - 1);
-    IntrosortUtil(arr, partitionPoint + 1, end, depthLimit - 1);
-  
-}
-  
-/* Implementation of introsort*/
-function Introsort(arr, begin, end)
-{
-    let depthLimit = 2 * log(end-begin);
-  
-    // Perform a recursive Introsort
-    IntrosortUtil(arr, begin, end, depthLimit);
-  
+
+async function swapTo(arr, pos, dest){
+  let dir
+  if (pos < dest){
+    dir = 1
+  }
+  else{
+    dir = -1
+  }
+  let tmp
+
+  while (pos != dest){
+    tmp = pos+dir
+    await swap(arr, pos, tmp)
+    pos = tmp
+  }
 }
 
 
-//Dual Pivot Quicksort
+async function weaveMerge(arr, l, m, h){
+  let dist = h-m
+  for (var i=0;i<dist;i++){
+    await swapTo(arr, m+i, l+i*2)
+  }
+  insertSort(arr, l, h)
+}
+
+async function mergeShaker(arr, l, m, h){
+  h--;
+  let dir = true;
+  while (l!=m && m<=h) {
+    if (dir) {
+      if (arr[l] > arr[m]) {
+        await swapTo(arr, m, l);
+        m++;
+      }
+      l++;
+      dir = false;
+    }
+    else {
+      if (arr[m - 1] > arr[h]) {
+        await swapTo(arr, m - 1, h);
+        m--;
+      }
+      h--;
+      dir = true;
+    }
+  }
+}
+
+
+async function weaveMergeSort(arr, l, h){
+  let m = floor((l+h) / 2)
+  if (l >= m){
+    return
+  }
+  await weaveMergeSort(arr, l, m)
+  await weaveMergeSort(arr, m, h)
+  await weaveMerge(arr, l, m, h)
+}
+
+async function shakerMergeSort(arr, l, h){
+  let m = floor((l+h) / 2)
+  if (l >= m){
+    return
+  }
+  await shakerMergeSort(arr, l, m)
+  await shakerMergeSort(arr, m, h)
+  await mergeShaker(arr, l, m, h)
+}
+
+
+//Gravity Sort
+function analyzeMax(arr, l, h){
+  let max = arr[l]
+  let tmp
+  for (let i = l + 1; i < h; i++) {
+    tmp = arr[i];
+    if (tmp > max)
+      max = tmp;
+  }
+
+  return max;
+}
+async function GravitySort(arr, l, h){
+  let max = analyzeMax(arr, l, h)
+  let sz = h-l
+  let abacus = new Array(sz)
+  for (var i=0;i<sz;i++){
+    abacus[i] = new Array(max)
+  }
+  for (let i = 0; i < sz; i++) {
+    let tmp = arr[l + i];
+    for (let j = 0; j < tmp; j++){
+      abacus[i][j] = -1;
+    }
+    //Fill rest with zeroes
+    for (let j = tmp; j < max; j++) {
+      abacus[i][j] = 0;
+    }
+  }
+  for (let i = max - 1; i >= 0; i--) {
+    let sum = 0;
+    for (let j = 0; j < sz; j++) {
+      if (abacus[j][i]) {
+        sum++;
+        abacus[j][i] = 0;
+        arr[l + j]--;
+        states[l+j] = 1
+        
+        //await sleep(delay)
+      }
+      //await sleep(delay)
+    }
+    for (let j = sz - 1; j >= sz - sum; j--) {
+      abacus[j][i] = -1;
+      arr[l + j]++;
+      //states[l+j] = 1
+
+      
+    }
+
+    await sleep(delay)
+  }
+}
+
 
