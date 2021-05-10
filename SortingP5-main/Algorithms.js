@@ -225,7 +225,7 @@ async function timSort(arr, n)
 //----
 
 //Radix Sort
-let base = 5
+let base = 6
 async function countingSort(arr, size, place){
   
   let output = new Array(size + 1).fill(0);
@@ -236,6 +236,7 @@ async function countingSort(arr, size, place){
   // Calculate count of elements
   for (let i = 0; i < size; i++){
       const num = floor(arr[i] / place) % base;
+      
       freq[num]++;
   }
   
@@ -245,19 +246,48 @@ async function countingSort(arr, size, place){
   }
 
   // Place the elements in sorted order
+  let f = [...freq]
   for (let i = size - 1; i >= 0; i--) {
       const num = floor(arr[i] / place) % base;
       output[freq[num] - 1] = arr[i];
+      
+      await sleep(delay)
+     
+
+      states[freq[num] - 1] = 1
+      //await sleep(delay)
+      //states[freq[num] - 1] = -1
       freq[num]--;
   }
+
+
+
+
+
+  // while (e >= 0 || n < size){
+  //   states[e] = 1
+  //   states[n] = 1
+  //   await sleep(delay)
+  //   states[e] = -1
+  //   states[n] =
+  //   e--
+  //   n++
+  // }
   
   //Copy the output array
+  
   for (let i = 0; i < size; i++){
+
     states[i] = 1
     arr[i] = output[i];
-    await sleep(delay)
+    if (i%2 == 0){
+      await sleep(delay)
+    }
     states[i] = -1
   }
+
+  
+
 }
 
 async function radixSort(arr){
@@ -340,7 +370,7 @@ async function heapSort(arr, n)
     for (let i = n / 2 - 1; i >= 0; i--){
         await heapify(arr, n, i);
 
-      }
+    }
  
     // One by one extract an element from heap
     for (let i = n - 1; i > 0; i--) {
@@ -447,27 +477,125 @@ async function combSort(arr)
 
 
 ///Introsort
-
-
-async function InsertionSort(arr, begin, end){
-  let left = begin - arr
-  let right = end - arr
-
-  for (var i=left+1;i<=right;i++){
-    let key = arr[i]
-    let j = i-1
-
-    while (j >= left && arr[j] > key)
+function InsertionSort(arr, begin, end)
+{
+    // Get the left and the right index of the subarray
+    // to be sorted
+    let left = begin - arr;
+    let right = end - arr;
+  
+    for (let i = left+1; i <= right; i++)
+    {
+        let key = arr[i];
+        let j = i-1;
+  
+       /* Move elements of arr[0..i-1], that are
+          greater than key, to one position ahead
+          of their current position */
+        while (j >= left && arr[j] > key)
         {
             arr[j+1] = arr[j];
             j = j-1;
         }
         arr[j+1] = key;
-  }
+   }
+  
+}
+  
+// A function to partition the array and return
+// the partition point
+async function Partition(arr, low, high)
+{
+    let pivot = arr[high];    // pivot
+    let i = (low - 1);  // Index of smaller element
+  
+    for (let j = low; j <= high- 1; j++)
+    {
+        // If current element is smaller than or
+        // equal to pivot
+        if (arr[j] <= pivot)
+        {
+            // increment index of smaller element
+            i++;
+  
+            await swap(arr, i, j);
+        }
+    }
+    await swap(arr, i+1, high);
+    return (arr + i + 1);
+}
+  
+  
+// A function that find the middle of the
+// values pointed by the pointers a, b, c
+// and return that pointer
+function MedianOfThree(a, b, c)
+{
+    if (a < b && b < c)
+        return (b);
+  
+    if ( a <  c &&  c <= b)
+        return (c);
+  
+    if (b <= a && a < c)
+        return (a);
+  
+    if (b < c && c <= a)
+        return (c);
+  
+    if (c <= a && a < b)
+        return (a);
+  
+    if (c <= b && b <= a)
+        return (b);
+}
+  
+// A Utility function to perform intro sort
+async function IntrosortUtil(arr, begin,
+                  end, depthLimit)
+{
+    // Count the number of elements
+    let size = end - begin;
+  
+      // If partition size is low then do insertion sort
+    if (size < 16)
+    {
+        InsertionSort(arr, begin, end);
+        return;
+    }
+  
+    // If the depth is zero use heapsort
+    if (depthLimit == 0)
+    {
+        make_heap(begin, end+1);
+        sort_heap(begin, end+1);
+        return;
+    }
+  
+    // Else use a median-of-three concept to
+    // find a good pivot
+    let pivot = MedianOfThree(begin, begin+size/2, end);
+  
+    // Swap the values pointed by the two pointers
+    await swap(arr, pivot, end);
+  
+   // Perform Quick Sort
+    let partitionPoint = Partition(arr, begin-arr, end-arr);
+    IntrosortUtil(arr, begin, partitionPoint-1, depthLimit - 1);
+    IntrosortUtil(arr, partitionPoint + 1, end, depthLimit - 1);
+  
+}
+  
+/* Implementation of introsort*/
+function Introsort(arr, begin, end)
+{
+    let depthLimit = 2 * log(end-begin);
+  
+    // Perform a recursive Introsort
+    IntrosortUtil(arr, begin, end, depthLimit);
+  
 }
 
 
-
-
-
+//Dual Pivot Quicksort
 
