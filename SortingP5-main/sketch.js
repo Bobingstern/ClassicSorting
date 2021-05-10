@@ -33,23 +33,26 @@ function setup() {
   selection.position(10, 10);
   selection.option('Quick Sort');
   selection.option('Merge Sort');
+  //selection.option('Merge Sort In-Place');
   //selection.option('Tim Sort');
   selection.option('Radix Sort');
-  
-  //selection.option('Insertion Sort');
+
+  selection.option('Insertion Sort');
   selection.option('Heap Sort');
   selection.option('Shell Sort');
   selection.option('Comb Sort');
+  //selection.option("Introsort")
   //selection.option('IntroSort');
   selection.selected('Quick Sort');
 
 
   shuffType = createSelect();
-  shuffType.position(120, 10);
+  shuffType.position(150, 10);
   shuffType.option('Normal Shuffle');
   shuffType.option('Reverse Shuffle');
   shuffType.option("Heapifyed Shuffle")
   shuffType.option("Almost Sorted")
+  shuffType.option("Sine Wave")
   shuffType.selected('Normal Shuffle');
 
   
@@ -80,6 +83,7 @@ function setup() {
   shuff.mousePressed(makeVals)
   
   makeVals()
+
 }
 
 
@@ -119,13 +123,10 @@ async function shuffleArr(arr, e, x){
     for (var i=0;i<e;i++){
       let a = i
       let b = round(random(0, arr.length-1))
-      states[a] = 1
-      states[b] = 1
       if (i % 3 == 0){
       await sleep(1);
       }
-      states[a] = -1
-      states[b] = -1
+
       let temp = arr[i];
       arr[a] = arr[b];
       arr[b] = temp;
@@ -136,13 +137,9 @@ async function shuffleArr(arr, e, x){
         let a = round(random(0, arr.length-1))
         let b = round(random(0, arr.length-1))
         if (a != b){
-          states[a] = 1
-          states[b] = 1
           if (i % 3 == 0){
           await sleep(1);
           }
-          states[a] = -1
-          states[b] = -1
           let temp = arr[a];
           arr[a] = arr[b];
           arr[b] = temp;
@@ -192,6 +189,15 @@ async function makeVals(){
   if (item == "Almost Sorted"){
     shuffleArr(values, round(values.length/10), true)
   }
+  if (item == "Sine Wave"){
+    console.log(values.length)
+    for (var i=0;i<values.length;i++){
+      values[i] = round(sin(i/(values.length/10)) * (height/3) + height/2)
+      if (i % 3 == 0){
+        await sleep(1)
+      }
+    }
+  }
   osc.fade(0, 0.1)
 }
 
@@ -220,7 +226,7 @@ function Run() {
       radixSort(values)
     }
     if (item == "Insertion Sort"){
-      insertionSortRecursive(values, values.length-1)
+      insertionSortRecursive(values, values.length)
 
     }
     if (item == "Heap Sort"){
@@ -235,9 +241,12 @@ function Run() {
       combSort(values)
 
     }
-    if (item == "IntroSort"){
-      introSort(values)
+    if (item == "Introsort"){
+      Introsort(values, 0, values.length)
 
+    }
+    if (item == "Merge Sort In-Place"){
+      mergeSort3Way(values, values.length)
     }
 
   }
