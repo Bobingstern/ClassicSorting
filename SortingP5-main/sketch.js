@@ -33,7 +33,8 @@ function setup() {
   selection.position(10, 10);
   selection.option('Quick Sort');
   selection.option('Merge Sort');
-  //selection.option('Merge Sort In-Place');
+  selection.option('Weave Merge Sort');
+  selection.option('Shaker Merge Sort');
   //selection.option('Tim Sort');
   selection.option('Radix Sort');
 
@@ -41,6 +42,7 @@ function setup() {
   selection.option('Heap Sort');
   selection.option('Shell Sort');
   selection.option('Comb Sort');
+  selection.option('Gravity Sort')
   //selection.option("Introsort")
   //selection.option('IntroSort');
   selection.selected('Quick Sort');
@@ -53,6 +55,9 @@ function setup() {
   shuffType.option("Heapifyed Shuffle")
   shuffType.option("Almost Sorted")
   shuffType.option("Sine Wave")
+  shuffType.option("Mountain")
+  shuffType.option("Scrambled Tail")
+  shuffType.option("Scrambled Head")
   shuffType.selected('Normal Shuffle');
 
   
@@ -64,11 +69,11 @@ function setup() {
   upButton = createButton("+")
   upButton.position(100, 30)
   upButton.mousePressed(function(){w = round(w/1.5)
-                                  makeSort()})
+                                  makeSort();makeVals()})
   downButton = createButton("-")
   downButton.position(70, 30)
   downButton.mousePressed(function(){w = round(w*1.5)
-                                  makeSort()})
+                                  makeSort();makeVals()})
 
   delUp = createButton("+Delay")
   delUp.position(130, 60)
@@ -122,8 +127,8 @@ async function shuffleArr(arr, e, x){
   if (!x){
     for (var i=0;i<e;i++){
       let a = i
-      let b = round(random(0, arr.length-1))
-      if (i % 3 == 0){
+      let b = round(random(i, arr.length-1))
+      if (i % 5 == 0){
       await sleep(1);
       }
 
@@ -137,7 +142,7 @@ async function shuffleArr(arr, e, x){
         let a = round(random(0, arr.length-1))
         let b = round(random(0, arr.length-1))
         if (a != b){
-          if (i % 3 == 0){
+          if (i % 5 == 0){
           await sleep(1);
           }
           let temp = arr[a];
@@ -189,11 +194,53 @@ async function makeVals(){
   if (item == "Almost Sorted"){
     shuffleArr(values, round(values.length/10), true)
   }
+
+  if (item == "Scrambled Head"){
+    for (var i=0;i<floor(values.length/5);i++){
+      let a = i
+      let b = round(random(i, floor(values.length/5)))
+      if (i % 5 == 0){
+      await sleep(1);
+      }
+
+      let temp = values[i];
+      values[a] = values[b];
+      values[b] = temp;
+
+    }
+  }
+  if (item == "Scrambled Tail"){
+    for (var i=values.length-floor(values.length/5);i<values.length;i++){
+      let a = i
+      let b = round(random(i, values.length-1))
+      if (i % 5 == 0){
+      await sleep(1);
+      }
+
+      let temp = values[a];
+      values[a] = values[b];
+      values[b] = temp;
+
+    }
+  }
+
+
+  if (item == "Mountain"){
+    var newArr = [...values]
+    newArr.reverse()
+    for (var i=floor(values.length/2);i<values.length;i++){
+      values[i] = newArr[i]
+    }
+    for (var i=0;i<values.length;i++){
+      values[i] = values[i]*2
+    }
+  }
+
   if (item == "Sine Wave"){
     console.log(values.length)
     for (var i=0;i<values.length;i++){
       values[i] = round(sin(i/(values.length/10)) * (height/3) + height/2)
-      if (i % 3 == 0){
+      if (i % 5 == 0){
         await sleep(1)
       }
     }
@@ -245,8 +292,14 @@ function Run() {
       Introsort(values, 0, values.length)
 
     }
-    if (item == "Merge Sort In-Place"){
-      mergeSort3Way(values, values.length)
+    if (item == "Weave Merge Sort"){
+      weaveMergeSort(values, 0, values.length)
+    }
+    if (item == "Shaker Merge Sort"){
+      shakerMergeSort(values, 0, values.length)
+    }
+    if (item == "Gravity Sort"){
+      GravitySort(values, 0, values.length)
     }
 
   }
