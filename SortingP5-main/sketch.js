@@ -14,6 +14,8 @@ var osc
 let sorted
 let shuffType
 let n
+let muted
+let mute
 
 function mousePressed(){
   
@@ -30,13 +32,13 @@ function setup() {
 
 
   selection = createSelect();
-  selection.position(10, 10);
+  selection.position(10, 60);
   selection.option('Quick Sort');
   selection.option('Quick-Insertion Sort');
   selection.option('Merge Sort');
   selection.option('Weave Merge Sort');
   selection.option('Shaker Merge Sort');
-  //selection.option('Tim Sort');
+  selection.option('Tim Sort');
   selection.option('Radix Sort');
 
   selection.option('Insertion Sort');
@@ -50,7 +52,7 @@ function setup() {
 
 
   shuffType = createSelect();
-  shuffType.position(150, 10);
+  shuffType.position(480, 60);
   shuffType.option('Normal Shuffle');
   shuffType.option('Reverse Shuffle');
   shuffType.option("Heapifyed Shuffle")
@@ -64,34 +66,43 @@ function setup() {
   
 
   runButton = createButton("Start")
-  runButton.position(10, 30)
+  runButton.position(730, 60)
   runButton.mousePressed(Run)
 
-  upButton = createButton("+")
-  upButton.position(100, 30)
+  upButton = createButton("+Size")
+  upButton.position(390, 60)
   upButton.mousePressed(function(){w = round(w/1.5)
                                   makeSort();makeVals()})
-  downButton = createButton("-")
-  downButton.position(70, 30)
-  downButton.mousePressed(function(){w = round(w*1.5)
-                                  makeSort();makeVals()})
+  downButton = createButton("-Size")
+  downButton.position(330, 60)
+  downButton.mousePressed(function(){if (values.length > 10){w = round(w*1.5)
+                                  makeSort();makeVals()}})
 
   delUp = createButton("+Delay")
-  delUp.position(130, 60)
+  delUp.position(240, 60)
   delUp.mousePressed(function(){delay += 5})
   delDown = createButton("-Delay")
-  delDown.position(70, 60)
+  delDown.position(180, 60)
   delDown.mousePressed(function(){if (delay > 5){delay -= 5}})
 
 
   shuff = createButton("Shuffle")
-  shuff.position(130, 30)
+  shuff.position(610, 59)
   shuff.mousePressed(makeVals)
-  
+
+  muted = createCheckbox('mute sound', false)
+  muted.position(900, 60)
+  muted.changed(checkED)
   makeVals()
 
 }
-
+function checkED() {
+  if (this.checked()) {
+    mute = true
+  } else {
+    mute = false
+  }
+}
 
 function playNote(note, duration) {
   osc.freq(midiToFreq(note));
@@ -113,7 +124,7 @@ function makeSort(){
       }
     values = new Array(floor(width/w));
     for (let i = 0; i < values.length; i++) {
-      values[i] = round(i*height/values.length)
+      values[i] = round(i*(height-90)/values.length)
       //values[i] = height-i*height/values.length
       states[i] = -1;
     }
@@ -167,7 +178,7 @@ async function makeVals(){
       }
     values = new Array(floor(width/w));
     for (let i = 0; i < values.length; i++) {
-      values[i] = round(i*height/values.length)
+      values[i] = round(i*(height-90)/values.length)
       //values[i] = height-i*height/values.length
       states[i] = -1;
     }
@@ -240,9 +251,8 @@ async function makeVals(){
   }
 
   if (item == "Sine Wave"){
-    console.log(values.length)
     for (var i=0;i<values.length;i++){
-      values[i] = round(sin(i/(values.length/10)) * (height/3) + height/2)
+      values[i] = round(sin(i/(values.length/10)) * ((height-90)/3) + (height-90)/2)
       if (i % 5 == 0){
         await sleep(1)
       }
@@ -258,6 +268,8 @@ function Run() {
   for (var i=0;i<states.length;i++){
       states[i] = -1
     }
+  xas =  Math.floor(2 * Math.floor(Math.log(values.length) /
+                                  Math.log(2)));
   userStartAudio();
   let item = selection.value();
   if (canRun){
@@ -316,15 +328,33 @@ function draw() {
   // put drawing code here
   
   background(56);
+  push()
+  fill(0)
+  rect(0, 0, width, 90)
+  pop()
+  push()
   textSize(30)
-  text("Delay:"+delay, 200, 50)
+  stroke(255)
+  fill(255)
+  text("Delay:"+delay, 160, 50)
+  text("Algorithm", 10, 50)
+  text("Size: "+values.length, 320, 50)
+  text("Shuffle", 480, 50)
+  text("Start", 720, 50)
+  text("Mute Sound", 830, 50)
+  pop()
   for (let i = 0; i < values.length; i++) {
     noStroke();
     if (states[i] == 0) {
       fill('#E0777D');
     } else if (states[i] == 1) {
-      let key = (map(values[i], 1, height, 1, 41))
-      playNote(key+40)  
+      if (!mute){
+        let key = (map(values[i], 1, height, 1, 41))
+        playNote(key+40)  
+      }
+      else{
+        osc.fade(0, 0.1)
+      }
 
       fill(255, 0, 0);
     } else {
