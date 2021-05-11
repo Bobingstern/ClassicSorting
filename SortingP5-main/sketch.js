@@ -13,7 +13,7 @@ let delDown
 var osc
 let sorted
 let shuffType
-
+let n
 
 function mousePressed(){
   
@@ -32,6 +32,7 @@ function setup() {
   selection = createSelect();
   selection.position(10, 10);
   selection.option('Quick Sort');
+  selection.option('Quick-Insertion Sort');
   selection.option('Merge Sort');
   selection.option('Weave Merge Sort');
   selection.option('Shaker Merge Sort');
@@ -44,7 +45,7 @@ function setup() {
   selection.option('Comb Sort');
   selection.option('Gravity Sort')
   //selection.option("Introsort")
-  //selection.option('IntroSort');
+  selection.option('IntroSort');
   selection.selected('Quick Sort');
 
 
@@ -154,6 +155,7 @@ async function shuffleArr(arr, e, x){
 }
 
 async function makeVals(){
+
   canRun = true
   for (var i=0;i<states.length;i++){
       states[i] = -1
@@ -169,6 +171,7 @@ async function makeVals(){
       //values[i] = height-i*height/values.length
       states[i] = -1;
     }
+    n = values.length
 
     if (values.length % 2 != 0){
     values.splice(values.length-1, 1)
@@ -262,6 +265,9 @@ function Run() {
     if (item == "Quick Sort"){
       quickSort(values, 0, values.length-1)
     }
+    if (item == "Quick-Insertion Sort"){
+      QISort()
+    }
     if (item == "Merge Sort"){
       mergeSort(values, 0, values.length-1)
     }
@@ -288,8 +294,8 @@ function Run() {
       combSort(values)
 
     }
-    if (item == "Introsort"){
-      Introsort(values, 0, values.length)
+    if (item == "IntroSort"){
+      sortDataIntro()
 
     }
     if (item == "Weave Merge Sort"){
