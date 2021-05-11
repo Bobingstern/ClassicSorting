@@ -152,7 +152,7 @@ async function partition(arr, low, high) {
 
 
 //Tim sort
-let RUN = 64
+let RUN = 12
 async function insertionSort(arr, left, right)
 {
     for (var i = left + 1; i <= right; i++)
@@ -162,9 +162,12 @@ async function insertionSort(arr, left, right)
         while (j >= left && arr[j] > temp)
         {
             arr[j+1] = arr[j];
+            states[j+1] = 1
+            await sleep(delay)
             j--;
         }
         arr[j+1] = temp;
+        states[j+1] = 1
         await sleep(delay)
     }
 }
@@ -217,7 +220,7 @@ async function timSort(arr, n)
 //----
 
 //Radix Sort
-let base = 6
+let base = 4
 async function countingSort(arr, size, place){
   
   let output = new Array(size + 1).fill(0);
@@ -242,15 +245,13 @@ async function countingSort(arr, size, place){
   for (let i = size - 1; i >= 0; i--) {
       const num = floor(arr[i] / place) % base;
       output[freq[num] - 1] = arr[i];
+      states[freq[num] - 1] = 1
       
       await sleep(delay)
-     
 
-      states[freq[num] - 1] = 1
-      //await sleep(delay)
-      //states[freq[num] - 1] = -1
       freq[num]--;
   }
+  
 
 
 
@@ -268,6 +269,10 @@ async function countingSort(arr, size, place){
   
   //Copy the output array
   
+
+
+
+
   for (let i = 0; i < size; i++){
 
     states[i] = 1
@@ -464,6 +469,19 @@ async function combSort(arr)
 ///Introsort
 
 //Merge sort in place
+let es = 0
+async function swapNoDelay(arr, a, b) {
+  states[a] = 1
+  states[b] = 1
+  if (es % 5==0){
+    await sleep(delay);
+    es = 0
+  }
+  let temp = arr[a];
+  arr[a] = arr[b];
+  arr[b] = temp;
+  es++
+}
 
 async function insertSort(arr, l, h){
   let tmp
@@ -495,7 +513,7 @@ async function swapTo(arr, pos, dest){
 
   while (pos != dest){
     tmp = pos+dir
-    await swap(arr, pos, tmp)
+    await swapNoDelay(arr, pos, tmp)
     pos = tmp
   }
 }
@@ -506,7 +524,7 @@ async function weaveMerge(arr, l, m, h){
   for (var i=0;i<dist;i++){
     await swapTo(arr, m+i, l+i*2)
   }
-  insertSort(arr, l, h)
+  await insertSort(arr, l, h)
 }
 
 async function mergeShaker(arr, l, m, h){
@@ -617,7 +635,7 @@ async function partitionQuickInsert(arr, low, high) {
   let pivot = arr[low]
   let i=low-1
   let j=high+1
-  if (high-low < 5){
+  if (high-low < 10){
     return false
   }
 
@@ -645,20 +663,25 @@ async function partitionQuickInsert(arr, low, high) {
 
 }
 
-let xas = 0
+let xas
 
 async function QISort(){
   await QuickInsert(values, 0, values.length-1)
   await insertSort(values, 0, values.length)
 }
 async function QuickInsert(arr, start, end){
+
   if (start >= end) {
     
     return;
   }
   let index = await partitionQuickInsert(arr, start, end);
+  
+
   if (!index){
     //await insertSort(values, start, end)
+    //await HeapSort(start, end)
+    //await mergeSort(arr, start, end)
     return
   }
   //states[index] = -1;
@@ -854,3 +877,12 @@ async function QuickInsert(arr, start, end){
  
         await sortDataUtil(0, n - 1, depthLimit);
     }
+
+
+//XD Sort
+
+
+
+
+
+
