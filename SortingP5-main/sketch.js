@@ -284,7 +284,7 @@ function Run() {
       mergeSort(values, 0, values.length-1)
     }
     if (item == "Tim Sort"){
-      timSort(values, values.length-1)
+      timSort(values, values.length)
     }
 
     if (item == "Radix Sort"){
