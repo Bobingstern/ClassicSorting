@@ -609,3 +609,248 @@ async function GravitySort(arr, l, h){
 }
 
 
+//Quick Insertion
+
+
+
+async function partitionQuickInsert(arr, low, high) {
+  let pivot = arr[low]
+  let i=low-1
+  let j=high+1
+  if (high-low < 5){
+    return false
+  }
+
+  while (true){
+    
+    states[i] = 1;
+    states[j] = 1;
+    i++
+    while (arr[i] < pivot){
+      i++
+    }
+
+    j--
+    while (arr[j] > pivot){
+      j--
+    }
+    if (i >= j){
+      return j
+    }
+    await swap(arr, i, j)
+
+
+
+  }
+
+}
+
+let xas = 0
+
+async function QISort(){
+  await QuickInsert(values, 0, values.length-1)
+  await insertSort(values, 0, values.length)
+}
+async function QuickInsert(arr, start, end){
+  if (start >= end) {
+    
+    return;
+  }
+  let index = await partitionQuickInsert(arr, start, end);
+  if (!index){
+    //await insertSort(values, start, end)
+    return
+  }
+  //states[index] = -1;
+
+  // Promise.all([quickSort(arr, start, index), quickSort(arr, index + 1, end)])
+  await QuickInsert(arr, start, index)
+  await QuickInsert(arr, index + 1, end)
+}
+
+
+//IntroSort
+
+
+ 
+    // The utility function to insert the data
+    async function dataAppend(temp)
+    {
+        values[n] = temp;
+        await sleep(delay)
+        n++;
+    }
+ 
+    // The utility function to swap two elements
+    
+ 
+    // To maxHeap a subtree rooted with node i which is
+    // an index in a[]. heapN is size of heap
+    async function maxHeap(i, heapN, begin)
+    {
+        let temp = values[begin + i - 1];
+        let child;
+ 
+        while (i <= floor(heapN / 2)) {
+            child = 2 * i;
+ 
+            if (child < heapN && values[begin + child - 1] < values[begin + child]){
+                child++;
+            }
+ 
+            if (temp >= values[begin + child - 1]){
+                break;
+            }
+ 
+            values[begin + i - 1] = values[begin + child - 1];
+            await sleep(delay)
+            i = child;
+        }
+        values[begin + i - 1] = temp;
+    }
+ 
+    // Function to build the heap (rearranging the array)
+    async function Heapify(begin, end, heapN)
+    {
+        for (let i = floor((heapN) / 2); i >= 1; i--){
+            await maxHeap(i, heapN, begin);
+        }
+    }
+ 
+    // main function to do heapsort
+    async function HeapSort(begin, end)
+    {
+        let heapN = end - begin;
+ 
+        // Build heap (rearrange array)
+        await Heapify(begin, end, heapN);
+ 
+        // One by one extract an element from heap
+        for (let i = heapN; i >= 1; i--) {
+ 
+            // Move current root to end
+            await swap(values, begin, begin + i);
+ 
+            // call maxHeap() on the reduced heap
+            await maxHeap(1, i, begin);
+        }
+    }
+ 
+    // function that implements insertion sort
+    async function insertionSortIntro(left, right)
+    {
+ 
+        for (let i = left; i <= right; i++) {
+            let key = values[i];
+            let j = i;
+ 
+            // Move elements of arr[0..i-1], that are
+            // greater than the key, to one position ahead
+            // of their current position
+            while (j > left && values[j - 1] > key) {
+              states[j] = 1
+                values[j] = values[j - 1];
+                await sleep(delay)
+                j--;
+            }
+            values[j] = key;
+            await sleep(delay)
+        }
+    }
+ 
+    // Function for finding the median of the three elements
+    async function findPivot(a1, b1, c1)
+    {
+        let max = Math.max(Math.max(values[a1], values[b1]), values[c1]);
+        let min = Math.min(Math.min(values[a1], values[b1]), values[c1]);
+        let median = max ^ min ^ values[a1] ^ values[b1] ^ values[c1];
+        if (median == values[a1]){
+            return a1;
+        }
+        if (median == values[b1]){
+            return b1;
+        }
+        return c1;
+    }
+ 
+    // This function takes the last element as pivot, places
+    // the pivot element at its correct position in sorted
+    // array, and places all smaller (smaller than pivot)
+    // to the left of the pivot
+    // and greater elements to the right of the pivot
+    async function Partition(low, high)
+    {
+ 
+        // pivot
+         let pivot = values[high];
+ 
+        // Index of smaller element
+        let i = (low - 1);
+        for (let j = low; j <= high - 1; j++) {
+ 
+            // If the current element is smaller
+            // than or equal to the pivot
+            if (values[j] <= pivot) {
+ 
+                // increment index of smaller element
+                i++;
+                await swap(values, i, j);
+            }
+        }
+        await swap(values, i + 1, high);
+        return (i + 1);
+
+        
+
+      
+    }
+ 
+    // The main function that implements Introsort
+    // low  --> Starting index,
+    // high  --> Ending index,
+    // depthLimit  --> recursion level
+    async function sortDataUtil(begin, end, depthLimit)
+    {
+        if (end - begin > 10) {
+            if (depthLimit == 0) {
+ 
+                // if the recursion limit is
+                // occurred call heap sort
+                await HeapSort(begin, end);
+                return;
+            }
+ 
+            depthLimit = depthLimit - 1;
+            let pivot = await findPivot(begin, begin + floor((end - begin) / 2) + 1,
+                                           end);
+            await swap(values, pivot, end);
+ 
+            // p is partitioning index,
+            // arr[p] is now at right place
+            let p = await Partition(begin, end);
+ 
+            // Separately sort elements before
+            // partition and after partition
+            await sortDataUtil(begin, p - 1, depthLimit);
+            await sortDataUtil(p + 1, end, depthLimit);
+        }
+ 
+        else {
+            // if the data set is small,
+            // call insertion sort
+            await insertionSortIntro(begin, end);
+        }
+    }
+ 
+    // A utility function to begin the
+    // Introsort module
+    async function sortDataIntro()
+    {
+ 
+        // Initialise the depthLimit
+        // as 2*log(length(data))
+        let depthLimit = floor(2 * Math.floor(Math.log(n) /
+                                  Math.log(2)));
+ 
+        await sortDataUtil(0, n - 1, depthLimit);
+    }
