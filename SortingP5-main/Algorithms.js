@@ -2,13 +2,31 @@
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+let nes = 0
+let bsy = 200
 async function swap(arr, a, b) {
   states[a] = 1
   states[b] = 1
-  await sleep(delay);
+  
+  await DelayNew()
+
   let temp = arr[a];
   arr[a] = arr[b];
   arr[b] = temp;
+  nes++
+}
+
+
+async function DelayNew(){
+  if (values.length > bsy){
+    if (nes % floor(values.length/bsy) == 0){
+      await sleep(delay);
+      nes = 0
+    }
+  }
+  else{
+    await sleep(delay);
+  }
 }
 
 //Merge Sort
@@ -31,6 +49,7 @@ async function merge(arr, l, m, r){
   }
   x = 0
   y = 0
+  let ene = 0
   while (y < n2 || x < n1){
     if (y < n2){
       y++
@@ -40,14 +59,21 @@ async function merge(arr, l, m, r){
     }
     states[m+1+y] = 1
     states[l+x] = 1
-    await sleep(delay)
+    if (values.length > bsy){
+      if (ene % 2==0){
+        await DelayNew()
+      }
+    }
+    else{
+      await DelayNew()
+    }
+    ene++
 
   }
 
   let i=0
   let j=0;
   let k=l;
-
   while (i < n1 && j < n2) {
         if (L[i] <= R[j]) {
             arr[k] = L[i];
@@ -61,14 +87,21 @@ async function merge(arr, l, m, r){
 
             j++;
         }
-        await sleep(delay)
+        if (values.length > bsy){
+          if (k%2==0){
+            await DelayNew()
+          }
+        }
+        else{
+          await DelayNew()
+        }
         k++;
 
     }
 
     while (i < n1) {
         arr[k] = L[i];
-        await sleep(1)
+        await DelayNew()
         i++;
         k++;
         states[k] = 1
@@ -77,7 +110,7 @@ async function merge(arr, l, m, r){
 
     while (j < n2) {
         arr[k] = R[j];
-        await sleep(1)
+        await DelayNew()
         j++;
         k++;
         states[k] = 1
@@ -163,12 +196,12 @@ async function insertionSort(arr, left, right)
         {
             arr[j+1] = arr[j];
             states[j+1] = 1
-            await sleep(delay)
+            await DelayNew()
             j--;
         }
         arr[j+1] = temp;
         states[j+1] = 1
-        await sleep(delay)
+        await DelayNew()
     }
 }
 
@@ -248,7 +281,7 @@ async function countingSort(arr, size, place){
       output[freq[num] - 1] = arr[i];
       states[freq[num] - 1] = 1
       
-      await sleep(delay)
+      await DelayNew()
 
       freq[num]--;
   }
@@ -279,7 +312,7 @@ async function countingSort(arr, size, place){
     states[i] = 1
     arr[i] = output[i];
     if (i%2 == 0){
-      await sleep(delay)
+      await DelayNew()
     }
   }
 
@@ -321,12 +354,12 @@ async function insertionSortRecursive(arr, n)
       of their current position */
     while (j >= 0 && arr[j] > last)
     {   states[j+1] = 1
-        await sleep(delay)
+        await DelayNew()
         arr[j+1] = arr[j];
         j--;
     }
     arr[j+1] = last;
-    await sleep(delay)
+    await DelayNew()
 }
 //---
 
@@ -405,7 +438,7 @@ async function ShellSort(arr, n){
             //  put temp (the original a[i]) in its correct location
             arr[j] = temp;
             states[j] = 1
-            await sleep(delay)
+            await DelayNew()
 
         }
     }
@@ -451,10 +484,10 @@ async function combSort(arr)
               var temp = arr[front];
               arr[front] = arr[back];
               states[front] = 1
-              await sleep(delay)
+              await DelayNew()
               states[back] = 1
               arr[back] = temp;
-              await sleep(delay)
+              await DelayNew()
           }
  
           // Increment and re-run swapping
@@ -475,7 +508,7 @@ async function swapNoDelay(arr, a, b) {
   states[a] = 1
   states[b] = 1
   if (es % 5==0){
-    await sleep(delay);
+    await DelayNew()
     es = 0
   }
   let temp = arr[a];
@@ -514,7 +547,7 @@ async function swapTo(arr, pos, dest){
 
   while (pos != dest){
     tmp = pos+dir
-    await swapNoDelay(arr, pos, tmp)
+    await swap(arr, pos, tmp)
     pos = tmp
   }
 }
@@ -623,7 +656,7 @@ async function GravitySort(arr, l, h){
       
     }
 
-    await sleep(delay)
+    await DelayNew()
   }
 }
 
@@ -727,7 +760,7 @@ async function QuickInsert(arr, start, end){
             }
  
             values[begin + i - 1] = values[begin + child - 1];
-            await sleep(delay)
+            await DelayNew()
             i = child;
         }
         values[begin + i - 1] = temp;
@@ -774,11 +807,11 @@ async function QuickInsert(arr, start, end){
             while (j > left && values[j - 1] > key) {
               states[j] = 1
                 values[j] = values[j - 1];
-                await sleep(delay)
+                await DelayNew()
                 j--;
             }
             values[j] = key;
-            await sleep(delay)
+            await DelayNew()
         }
     }
  
