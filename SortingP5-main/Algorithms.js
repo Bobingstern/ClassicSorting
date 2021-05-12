@@ -176,9 +176,10 @@ async function timSort(arr, n)
 {
 
     // Sort individual subarrays of size RUN
-    for (var i = 0; i < n; i+=RUN)
-        await insertionSort(arr, i, min((i+RUN-1),
-                                    (n-1)));
+    for (var i = 0; i < n; i+=RUN){
+        await insertionSort(arr, i, min((i+RUN-1),(n-1)));
+        //await quickSort(arr, i, min((i+RUN-1),(n-1)))
+    }
 
     // Start merging from size RUN (or 32).
     // It will merge
@@ -879,7 +880,178 @@ async function QuickInsert(arr, start, end){
     }
 
 
-//XD Sort
+//Quick-Merge Sort
+let RUNQ = 64
+async function quickMergeSort(arr, n)
+{
+
+    // Sort individual subarrays of size RUN
+    for (var i = 0; i < n; i+=RUNQ){
+        //await insertionSort(arr, i, min((i+RUN-1),(n-1)));
+        await quickSort(arr, i, min((i+RUNQ-1),(n-1)))
+    }
+
+    // Start merging from size RUN (or 32).
+    // It will merge
+    // to form size 64, then 128, 256
+    // and so on ....
+    for (var size = RUNQ; size < n;
+                             size = 2*size)
+    {
+
+        // pick starting point of
+        // left sub array. We
+        // are going to merge
+        // arr[left..left+size-1]
+        // and arr[left+size, left+2*size-1]
+        // After every merge, we
+        // increase left by 2*size
+        for (var left = 0; left < n;
+                             left += 2*size)
+        {
+
+            // find ending point of
+            // left sub array
+            // mid+1 is starting point
+            // of right sub array
+            var mid = left + size - 1;
+            var right = min((left + 2*size - 1),
+                                            (n-1));
+
+            // merge sub array arr[left.....mid] &
+            // arr[mid+1....right]
+              if(mid < right)
+                await merge(arr, left, mid, right);
+        }
+    }
+}
+let RUNH = 32
+async function mergeHeapSort(arr, n)
+{
+
+    // Sort individual subarrays of size RUN
+    for (var i = 0; i < n; i+=RUNH){
+        //await insertionSort(arr, i, min((i+RUN-1),(n-1)));
+        await HeapSort(i, min((i+RUNH-1),(n-1)))
+    }
+
+    // Start merging from size RUN (or 32).
+    // It will merge
+    // to form size 64, then 128, 256
+    // and so on ....
+    for (var size = RUNH; size < n;
+                             size = 2*size)
+    {
+
+        // pick starting point of
+        // left sub array. We
+        // are going to merge
+        // arr[left..left+size-1]
+        // and arr[left+size, left+2*size-1]
+        // After every merge, we
+        // increase left by 2*size
+        for (var left = 0; left < n;
+                             left += 2*size)
+        {
+
+            // find ending point of
+            // left sub array
+            // mid+1 is starting point
+            // of right sub array
+            var mid = left + size - 1;
+            var right = min((left + 2*size - 1),
+                                            (n-1));
+
+            // merge sub array arr[left.....mid] &
+            // arr[mid+1....right]
+              if(mid < right)
+                await merge(arr, left, mid, right);
+        }
+    }
+}
+
+
+//Dueling Quick Sort
+  
+    async function dualPivot(array, left, right, divisor) {
+        let length = right - left;
+        
+        // insertion sort for tiny array
+        if(length < 10) {
+          await insertSort(array, left, right+1)
+          return;
+        }
+        
+        let third = ceil(length / divisor)
+        
+        // "medians"
+        let med1 = left  + third;
+        let med2 = right - third;
+        
+        if(med1 <= left) {
+            med1 = left + 1;
+        }
+        if(med2 >= right) {
+            med2 = right - 1;
+        }
+        if(array[med1] < array[med2]) {
+            await swap(array, med1, left,);
+            await swap(array, med2, right);
+        }
+        else {
+            await swap(array, med1, right);
+            await swap(array, med2, left);
+        }
+        
+        // pivots
+        let pivot1 = array[left];
+        let pivot2 = array[right];
+        
+        // pointers
+        let less  = left  + 1;
+        let great = right - 1;
+        
+        // sorting
+        for(let k = less; k <= great; k++) {
+            if(array[k] < pivot1) {
+                await swap(array, k, less++);
+            }
+            else if(array[k] > pivot2 == 1) {
+                while(k < great && array[great] > pivot2) {
+                    great--;
+                }
+                await swap(array, k, great--);
+                
+                if(array[k]<pivot1) {
+                    await swap(array, k, less++);
+                }
+            }
+        }
+        
+        // swaps
+        let dist = great - less;
+        
+        if(dist < 13) {
+            divisor++;
+        }
+        await swap(array, less  - 1, left);
+        await swap(array, great + 1, right);
+        
+        // subarrays
+        await dualPivot(array, left,   less - 2, divisor);
+        if(pivot1 < pivot2) {
+            await dualPivot(array, less, great, divisor);
+        }
+        await dualPivot(array, great + 2, right, divisor);
+    }
+    
+    async function DuelPivotQuickSort(array, sortLength){
+        await dualPivot(array, 0, sortLength - 1, 3);
+    }
+
+
+
+
 
 
 
