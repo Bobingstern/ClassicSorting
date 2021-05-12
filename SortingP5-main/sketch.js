@@ -294,8 +294,7 @@ function Run() {
       mergeHeapSort(values, values.length)
     }
     if (item == "Merge Sort"){
-      //mergeSort(values, 0, values.length-1)
-      HolyGrail(values, 0, values.length)
+      mergeSort(values, 0, values.length-1)
     }
     if (item == "Tim Sort"){
       timSort(values, values.length)
