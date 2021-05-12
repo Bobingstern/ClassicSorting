@@ -34,8 +34,11 @@ function setup() {
   selection = createSelect();
   selection.position(10, 60);
   selection.option('Quick Sort');
+  selection.option('Dual-Pivot Quick Sort');
   selection.option('Quick-Insertion Sort');
+  //selection.option('Quick-Merge Sort');
   selection.option('Merge Sort');
+  //selection.option('Merge-Heap Sort');
   selection.option('Weave Merge Sort');
   selection.option('Shaker Merge Sort');
   selection.option('Tim Sort');
@@ -276,12 +279,23 @@ function Run() {
     canRun = false
     if (item == "Quick Sort"){
       quickSort(values, 0, values.length-1)
+      
+    }
+    if (item == "Dual-Pivot Quick Sort"){
+      DuelPivotQuickSort(values, values.length)
     }
     if (item == "Quick-Insertion Sort"){
       QISort()
     }
+    if (item == "Quick-Merge Sort"){
+      quickMergeSort(values, values.length)
+    }
+    if (item == "Merge-Heap Sort"){
+      mergeHeapSort(values, values.length)
+    }
     if (item == "Merge Sort"){
-      mergeSort(values, 0, values.length-1)
+      //mergeSort(values, 0, values.length-1)
+      HolyGrail(values, 0, values.length)
     }
     if (item == "Tim Sort"){
       timSort(values, values.length)
