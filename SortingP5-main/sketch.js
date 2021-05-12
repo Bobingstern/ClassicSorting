@@ -144,7 +144,7 @@ async function shuffleArr(arr, e, x){
       let a = i
       let b = round(random(i, arr.length-1))
       if (i % 5 == 0){
-      await sleep(1);
+      await DelayNew()
       }
 
       let temp = arr[i];
@@ -158,7 +158,7 @@ async function shuffleArr(arr, e, x){
         let b = round(random(0, arr.length-1))
         if (a != b){
           if (i % 5 == 0){
-          await sleep(1);
+          await DelayNew()
           }
           let temp = arr[a];
           arr[a] = arr[b];
@@ -204,7 +204,7 @@ async function makeVals(){
     let n = values.length
     for (let i = n / 2 - 1; i >= 0; i--){
         heapify(values, n, i);
-        await sleep(1)
+        await DelayNew()
 
     }
   }
@@ -217,7 +217,7 @@ async function makeVals(){
       let a = i
       let b = round(random(i, floor(values.length/5)))
       if (i % 5 == 0){
-      await sleep(1);
+      await DelayNew()
       }
 
       let temp = values[i];
@@ -231,7 +231,7 @@ async function makeVals(){
       let a = i
       let b = round(random(i, values.length-1))
       if (i % 5 == 0){
-      await sleep(1);
+      await DelayNew()
       }
 
       let temp = values[a];
@@ -265,6 +265,7 @@ async function makeVals(){
 }
 
 function Run() {
+  nes = 0
   if (values.length % 2 != 0){
     values.splice(values.length-1, 1)
   }
@@ -295,6 +296,7 @@ function Run() {
     }
     if (item == "Merge Sort"){
       mergeSort(values, 0, values.length-1)
+      //HolyGrail(values, 0, values.length)
     }
     if (item == "Tim Sort"){
       timSort(values, values.length)
@@ -339,7 +341,6 @@ function Run() {
 
 function draw() {
   // put drawing code here
-  
   background(56);
   push()
   fill(0)
@@ -378,8 +379,9 @@ function draw() {
     rect(i * w, height - values[i], w, values[i]);
     states[i] = -1
   }
-  if (is_array_sorted(values)){
+  if (is_array_sorted(values) || canRun){
     osc.fade(0, 0.1)
   }
+
 
 }
