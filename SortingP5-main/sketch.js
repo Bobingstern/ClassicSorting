@@ -144,7 +144,6 @@ async function shuffleArr(arr, e, x){
       let a = i
       let b = round(random(i, arr.length-1))
       if (i % 5 == 0){
-      await DelayNew()
       }
 
       let temp = arr[i];
@@ -158,7 +157,6 @@ async function shuffleArr(arr, e, x){
         let b = round(random(0, arr.length-1))
         if (a != b){
           if (i % 5 == 0){
-          await DelayNew()
           }
           let temp = arr[a];
           arr[a] = arr[b];
@@ -204,7 +202,6 @@ async function makeVals(){
     let n = values.length
     for (let i = n / 2 - 1; i >= 0; i--){
         heapify(values, n, i);
-        await DelayNew()
 
     }
   }
@@ -217,7 +214,6 @@ async function makeVals(){
       let a = i
       let b = round(random(i, floor(values.length/5)))
       if (i % 5 == 0){
-      await DelayNew()
       }
 
       let temp = values[i];
@@ -231,7 +227,6 @@ async function makeVals(){
       let a = i
       let b = round(random(i, values.length-1))
       if (i % 5 == 0){
-      await DelayNew()
       }
 
       let temp = values[a];
