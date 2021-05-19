@@ -38,6 +38,7 @@ function setup() {
   selection.option('Quick-Insertion Sort');
   //selection.option('Quick-Merge Sort');
   selection.option('Merge Sort');
+  selection.option('Bitonic Merge Sort');
   //selection.option('Merge-Heap Sort');
   selection.option('Weave Merge Sort');
   selection.option('Shaker Merge Sort');
@@ -202,6 +203,7 @@ async function makeVals(){
     let n = values.length
     for (let i = n / 2 - 1; i >= 0; i--){
         heapify(values, n, i);
+        //await sleep(1)
 
     }
   }
@@ -252,7 +254,7 @@ async function makeVals(){
     for (var i=0;i<values.length;i++){
       values[i] = round(sin(i/(values.length/10)) * ((height-90)/3) + (height-90)/2)
       if (i % 5 == 0){
-        await sleep(1)
+        //await sleep(1)
       }
     }
   }
@@ -291,7 +293,10 @@ function Run() {
     }
     if (item == "Merge Sort"){
       mergeSort(values, 0, values.length-1)
-      //HolyGrail(values, 0, values.length)
+    }
+    if (item == "Bitonic Merge Sort"){
+      let b = true
+      BitonicSort(values, values.length, b)
     }
     if (item == "Tim Sort"){
       timSort(values, values.length)
