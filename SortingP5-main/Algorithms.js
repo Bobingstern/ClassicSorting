@@ -98,10 +98,16 @@ async function merge(arr, l, m, r){
         k++;
 
     }
-
     while (i < n1) {
         arr[k] = L[i];
-        await DelayNew()
+        if (values.length > bsy){
+          if (k%2==0){
+            await DelayNew()
+          }
+        }
+        else{
+          await DelayNew()
+        }
         i++;
         k++;
         states[k] = 1
@@ -110,7 +116,14 @@ async function merge(arr, l, m, r){
 
     while (j < n2) {
         arr[k] = R[j];
-        await DelayNew()
+        if (values.length > bsy){
+          if (k%2==0){
+            await DelayNew()
+          }
+        }
+        else{
+          await DelayNew()
+        }
         j++;
         k++;
         states[k] = 1
@@ -181,11 +194,12 @@ async function partition(arr, low, high) {
 }
 
 
+
 //---
 
 
 //Tim sort
-let RUN = 12
+let RUN = 10
 async function insertionSort(arr, left, right)
 {
     for (var i = left + 1; i <= right; i++)
@@ -390,6 +404,31 @@ async function heapify(arr, n, i){
         await heapify(arr, n, largest);
     }
 }
+async function heapifyShuffle(arr, n, i){
+
+    let largest = i; // Initialize largest as root
+    let l = 2 * i + 1; // left = 2*i + 1
+    let r = 2 * i + 2; // right = 2*i + 2
+ 
+    // If left child is larger than root
+    if (l < n && arr[l] > arr[largest]){
+        largest = l;
+    }    
+ 
+    // If right child is larger than largest so far
+    if (r < n && arr[r] > arr[largest]){
+        largest = r;
+    }
+ 
+    // If largest is not root
+    if (largest != i) {
+        await swapNoDelay(arr, i, largest);
+        states[i] = 0
+ 
+        // Recursively heapify the affected sub-tree
+        await heapifyShuffle(arr, n, largest);
+    }
+}
 
 async function heapSort(arr, n)
 {
@@ -432,13 +471,22 @@ async function ShellSort(arr, n){
             var j;            
             for (j = i; j >= gap && arr[j - gap] > temp; j -= gap){
               arr[j] = arr[j - gap];
+              states[j] = 1
               //await sleep(1)
             }
               
             //  put temp (the original a[i]) in its correct location
             arr[j] = temp;
             states[j] = 1
-            await DelayNew()
+            if (values.length > bsy){
+              if (nes % 2 == 0){
+                await DelayNew()
+              }
+              nes++
+            }
+            else{
+              await DelayNew()
+            } 
 
         }
     }
@@ -553,13 +601,7 @@ async function swapTo(arr, pos, dest){
 }
 
 
-async function weaveMerge(arr, l, m, h){
-  let dist = h-m
-  for (var i=0;i<dist;i++){
-    await swapTo(arr, m+i, l+i*2)
-  }
-  await insertSort(arr, l, h)
-}
+
 
 async function mergeShaker(arr, l, m, h){
   h--;
@@ -585,16 +627,6 @@ async function mergeShaker(arr, l, m, h){
 }
 
 
-async function weaveMergeSort(arr, l, h){
-  let m = floor((l+h) / 2)
-  if (l >= m){
-    return
-  }
-  await weaveMergeSort(arr, l, m)
-  await weaveMergeSort(arr, m, h)
-  await weaveMerge(arr, l, m, h)
-}
-
 async function shakerMergeSort(arr, l, h){
   let m = floor((l+h) / 2)
   if (l >= m){
@@ -603,6 +635,29 @@ async function shakerMergeSort(arr, l, h){
   await shakerMergeSort(arr, l, m)
   await shakerMergeSort(arr, m, h)
   await mergeShaker(arr, l, m, h)
+}
+
+//WEave
+
+async function weaveMerge(arr, min, mid, max){
+  let i = 1;
+    let target = (mid - min);
+      
+      while(i <= target) {
+          await swapTo(arr, mid + i, min + (i * 2) - 1);
+          i++;
+      }
+  await insertSort(arr, min, max+1)
+}
+
+async function weaveMergeSort(arr, l, h){
+  let m = floor((l+h) / 2)
+  if (l >= m){
+    return
+  }
+  await weaveMergeSort(arr, l, m)
+  await weaveMergeSort(arr, m, h)
+  await weaveMerge(arr, l, m, h)
 }
 
 
@@ -1084,6 +1139,59 @@ async function mergeHeapSort(arr, n)
 
 
 
+//Bitonic Hell
+
+
+async function exchange(arr, i, j, d){
+
+  if (d==(arr[i] > arr[j])){
+    await swap(arr, i, j)
+  }
+
+}
+
+function greatestPowerOfTwoLessThan(n)
+{
+        let k=1;
+        while (k>0 && k<n){
+            k=k<<1;
+          }
+        return k>>>1;
+}
+
+
+async function mergeBit(arr, l, c, d)  
+{  
+    let k,i;  
+    if (c>1)  
+    {  
+        k = round(greatestPowerOfTwoLessThan(c));  
+        for (i=l; i<l+c-k; i++){ 
+            await exchange(arr, i, i+k, d);  
+        }
+        await mergeBit(arr, l, k, d);  
+        await mergeBit(arr, l+k, c-k, d);  
+    }  
+} 
+
+
+async function bitonicSort(arr, l, c, d)  
+{  
+    let k;  
+    if (c>1)  
+    {  
+        k = round(c/2);  
+        await bitonicSort(arr, l, k, !d);  
+        await bitonicSort(arr, l+k, k, d);  
+        await mergeBit(arr,l, c, d);  
+    }  
+}  
+   
+async function BitonicSort(arr, n, order)  
+{  
+    await bitonicSort(arr, 0, n, order);  
+    await insertSort(values, 0, values.length)
+}  
 
 
 
