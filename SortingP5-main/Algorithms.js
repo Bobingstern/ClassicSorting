@@ -1195,6 +1195,124 @@ async function BitonicSort(arr, n, order)
 
 
 
+//Bubble Sort
+async function bubbleSort(arr)
+{
+  for (i = 0; i < arr.length-1; i++)      
+
+     // Last i elements are already in place   
+     for (j = 0; j < arr.length-i-1; j++)
+     {
+         if(arr[j] > arr[j+1]){
+             await swap(arr, j, j+1);
+          }
+     }
+} 
+
+
+//Bogo Sort
+
+function is_array_sortedMin(arr, l, r) {
+      var sorted = true;
+      for (var i = l; i < r; i++) {
+          if (arr[i] > arr[i + 1]) {
+              sorted = false;
+              break;
+          }
+      }
+      return sorted;
+  }
+
+
+function bogoShuffle(arr, l, r){
+  
+    for (var i=l;i<r;i++){
+      let a = i
+      let b = round(random(i, r))
+
+      let temp = arr[i];
+      arr[a] = arr[b];
+      arr[b] = temp;
+    }
+  
+}
+
+
+async function BogoSort(arr){
+    while (!is_array_sorted(arr)){
+      bogoShuffle(arr, 0, arr.length-1)
+      await sleep(delay)
+      states[round(random(0, arr.length-1))] = 1
+    }
+  
+}
+
+
+async function LessBogoSort(arr){
+  for (let i = 0; i < arr.length; i++) {
+            let ex = arr.slice(i, arr.length)
+            let m = Math.min.apply(Math, ex)
+            while (arr[i] != m){
+                bogoShuffle(arr, i, arr.length-1)
+                states[i] = 1
+                states[round(random(i, arr.length-1))] = 1
+                await sleep(delay)
+            }
+
+      }
+}
+
+
+//Weaved Merge sort ...?
+
+async function WeavedMerge(array, tmp, length, residue, modulus) {
+        if (residue+modulus >= length){
+            return;
+          }
+            
+        let low = residue;
+        let high = residue+modulus;
+        let dmodulus = floor(modulus<<1);
+
+        await WeavedMerge(array, tmp, length, low, dmodulus);
+        await WeavedMerge(array, tmp, length, high, dmodulus);
+
+        states[high] = 1
+        states[low] = 1
+        let nxt = residue;
+        for (; low < length && high < length; nxt+=modulus) {
+            if (array[low] > array[high] || array[low] == array[high] && low > high) {
+              tmp[nxt] = array[high]
+              high += dmodulus;
+            } else {
+                tmp[nxt] = array[low]
+                low += dmodulus;
+            }
+        }
+
+        if (low >= length) {
+            while (high < length) {
+              tmp[nxt] = array[high]
+
+                nxt += modulus;
+                high += dmodulus;
+            }
+        } else {
+            while (low < length) {
+              tmp[nxt] = array[low]
+                nxt += modulus;
+                low += dmodulus;
+            }
+        }
+
+
+        for (let i = residue; i < length; i+=modulus) {
+          array[i] = tmp[i]
+          states[i] = 1
+          await sleep(delay)
+        }
+    }
+
 
 
 
