@@ -34,12 +34,14 @@ function setup() {
   selection = createSelect();
   selection.position(10, 60);
   selection.option('Quick Sort');
+  selection.option('Bubble Sort');
   selection.option('Dual-Pivot Quick Sort');
   selection.option('Quick-Insertion Sort');
   //selection.option('Quick-Merge Sort');
   selection.option('Merge Sort');
   selection.option('Bitonic Merge Sort');
   //selection.option('Merge-Heap Sort');
+  selection.option('Weaved Merge Sort');
   selection.option('Weave Merge Sort');
   selection.option('Shaker Merge Sort');
   selection.option('Tim Sort');
@@ -52,6 +54,8 @@ function setup() {
   selection.option('Gravity Sort')
   //selection.option("Introsort")
   selection.option('IntroSort');
+  selection.option('Bogo Sort');
+  selection.option('Less Bogo Sort');
   selection.selected('Quick Sort');
 
 
@@ -79,7 +83,7 @@ function setup() {
                                   makeSort();makeVals()})
   downButton = createButton("-Size")
   downButton.position(330, 60)
-  downButton.mousePressed(function(){if (values.length > 10){w = round(w*1.5)
+  downButton.mousePressed(function(){if (values.length > 5){w = round(w*1.5)
                                   makeSort();makeVals()}})
 
   delUp = createButton("+Delay")
@@ -277,7 +281,15 @@ function Run() {
     canRun = false
     if (item == "Quick Sort"){
       quickSort(values, 0, values.length-1)
-      
+    }
+    if (item == "Bubble Sort"){
+      bubbleSort(values)
+    }
+    if (item == "Bogo Sort"){
+      BogoSort(values)
+    }
+    if (item == "Less Bogo Sort"){
+      LessBogoSort(values)
     }
     if (item == "Dual-Pivot Quick Sort"){
       DuelPivotQuickSort(values, values.length)
@@ -293,6 +305,11 @@ function Run() {
     }
     if (item == "Merge Sort"){
       mergeSort(values, 0, values.length-1)
+
+    }
+    if (item == "Weaved Merge Sort"){
+      let tmp = new Array(values.length)
+      WeavedMerge(values, tmp, values.length, 0, 1)
     }
     if (item == "Bitonic Merge Sort"){
       let b = true
