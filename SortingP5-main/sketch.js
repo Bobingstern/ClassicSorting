@@ -268,7 +268,7 @@ async function makeVals(){
   if (item == "Quick Sort Killer"){
     let currl = values.length
      for (var j=currl-currl%2-2, i=j;i>=0;i-=2,j--){
-        await swap(values, i, j)
+        swap(values, i, j)
      } 
      
   }
