@@ -66,7 +66,7 @@ function setup() {
   shuffType.option('Reverse Shuffle');
   shuffType.option("Heapifyed Shuffle")
   shuffType.option("Almost Sorted")
-  shuffType.option("Quick Sort Killer")
+  //shuffType.option("Quick Sort Killer")
   shuffType.option("Sine Wave")
   shuffType.option("Mountain")
   shuffType.option("Scrambled Tail")
