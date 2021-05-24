@@ -66,6 +66,7 @@ function setup() {
   shuffType.option('Reverse Shuffle');
   shuffType.option("Heapifyed Shuffle")
   shuffType.option("Almost Sorted")
+  shuffType.option("Quick Sort Killer")
   shuffType.option("Sine Wave")
   shuffType.option("Mountain")
   shuffType.option("Scrambled Tail")
@@ -263,7 +264,16 @@ async function makeVals(){
       }
     }
   }
+
+  if (item == "Quick Sort Killer"){
+    let currl = values.length
+     for (var j=currl-currl%2-2, i=j;i>=0;i-=2,j--){
+        await swap(values, i, j)
+     } 
+     
+  }
   osc.fade(0, 0.1)
+    
 }
 
 async function Run() {
@@ -318,7 +328,7 @@ async function Run() {
     }
     if (item == "Bitonic Merge Sort"){
       let b = true
-      BitonicSort(values, values.length, b)
+      BitonicSort(values, values.length-1, b)
     }
     if (item == "Tim Sort"){
       timSort(values, values.length)
@@ -328,7 +338,7 @@ async function Run() {
       radixSort(values)
     }
     if (item == "Insertion Sort"){
-      insertSort(values, 0, values.length)
+      insertionSortRecursive(values, values.length)
 
     }
     if (item == "Heap Sort"){
