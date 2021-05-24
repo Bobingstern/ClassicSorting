@@ -1344,10 +1344,8 @@ async function grailSort(array, length){
   let extBuffer = new Array(512)
   let grail = new GrailSort(comp)
   let a = [...array]
-  grail.grailCommonSort(array, 0, length, extBuffer, extBuffer.length)
-  for (var i=0;i<anim.length;i++){
-    //await swap(array, anim[i][0], anim[i][1])
-  }
+  //grail.grailCommonSort(array, 0, length, extBuffer, extBuffer.length)
+  grail.grailSortInPlace(array, 0, array.length)
 
 }
 
