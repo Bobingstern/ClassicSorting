@@ -13,7 +13,6 @@ async function swap(arr, a, b) {
   let temp = arr[a];
   arr[a] = arr[b];
   arr[b] = temp;
-  nes++
 }
 
 
@@ -27,6 +26,7 @@ async function DelayNew(){
   else{
     await sleep(delay);
   }
+  nes++
 }
 
 //Merge Sort
