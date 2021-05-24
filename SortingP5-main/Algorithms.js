@@ -755,9 +755,11 @@ async function QuickInsert(arr, start, end){
 
 
  
+//IntroSort
+
+
+ 
     // The utility function to insert the data
-    let toHeap = []
-    let toInsert = []
     async function dataAppend(temp)
     {
         values[n] = temp;
@@ -787,7 +789,7 @@ async function QuickInsert(arr, start, end){
             }
  
             values[begin + i - 1] = values[begin + child - 1];
-            await DelayNew()
+            await sleep(delay)
             i = child;
         }
         values[begin + i - 1] = temp;
@@ -834,11 +836,11 @@ async function QuickInsert(arr, start, end){
             while (j > left && values[j - 1] > key) {
               states[j] = 1
                 values[j] = values[j - 1];
-                await DelayNew()
+                await sleep(delay)
                 j--;
             }
             values[j] = key;
-            await DelayNew()
+            await sleep(delay)
         }
     }
  
@@ -865,32 +867,24 @@ async function QuickInsert(arr, start, end){
     async function Partition(low, high)
     {
  
-      let pivot = values[low]
-      let i=low-1
-      let j=high+1
-
-
-      while (true){
-        
-        states[i] = 1;
-        states[j] = 1;
-        i++
-        while (values[i] < pivot){
-          i++
+        // pivot
+         let pivot = values[high];
+ 
+        // Index of smaller element
+        let i = (low - 1);
+        for (let j = low; j <= high - 1; j++) {
+ 
+            // If the current element is smaller
+            // than or equal to the pivot
+            if (values[j] <= pivot) {
+ 
+                // increment index of smaller element
+                i++;
+                await swap(values, i, j);
+            }
         }
-
-        j--
-        while (values[j] > pivot){
-          j--
-        }
-        if (i >= j){
-          return j
-        }
-        await swap(values, i, j)
-
-
-
-        }
+        await swap(values, i + 1, high);
+        return (i + 1);
 
         
 
@@ -903,14 +897,11 @@ async function QuickInsert(arr, start, end){
     // depthLimit  --> recursion level
     async function sortDataUtil(begin, end, depthLimit)
     {
-      let canIn = true
         if (end - begin > 10) {
             if (depthLimit == 0) {
  
                 // if the recursion limit is
                 // occurred call heap sort
-                canIn = false
-                //toHeap.push([begin, end])
                 await HeapSort(begin, end);
                 return;
             }
@@ -926,16 +917,13 @@ async function QuickInsert(arr, start, end){
  
             // Separately sort elements before
             // partition and after partition
-            await sortDataUtil(begin, p, depthLimit);
+            await sortDataUtil(begin, p - 1, depthLimit);
             await sortDataUtil(p + 1, end, depthLimit);
         }
  
         else {
             // if the data set is small,
             // call insertion sort
-            if (canIn){
-            //toInsert.push([begin, end])
-            }
             await insertionSortIntro(begin, end);
         }
     }
@@ -944,23 +932,14 @@ async function QuickInsert(arr, start, end){
     // Introsort module
     async function sortDataIntro()
     {
-        toInsert = []
-        toHeap = []
+ 
         // Initialise the depthLimit
         // as 2*log(length(data))
         let depthLimit = floor(2 * Math.floor(Math.log(n) /
                                   Math.log(2)));
  
         await sortDataUtil(0, n - 1, depthLimit);
-        // for (var i=0;i<toHeap.length;i++){
-        //   await HeapSort(values, toHeap[0], toHeap[1])
-        // }
-        // for (var i=0;i<toInsert.length;i++){
-        //   await insertSort(values, toInsert[0], toInsert[1])
-        // }
-        
     }
-
 
 //Quick-Merge Sort
 let RUNQ = 64
