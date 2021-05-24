@@ -266,7 +266,7 @@ async function makeVals(){
   osc.fade(0, 0.1)
 }
 
-function Run() {
+async function Run() {
   nes = 0
   if (values.length % 2 != 0){
     values.splice(values.length-1, 1)
@@ -344,8 +344,8 @@ function Run() {
 
     }
     if (item == "IntroSort"){
-      sortDataIntro()
-      insertSort(values, 0, values.length)
+      await sortDataIntro()
+      await insertSort(values, 0, values.length)
 
     }
     if (item == "Weave Merge Sort"){
