@@ -59,14 +59,7 @@ async function merge(arr, l, m, r){
     }
     states[m+1+y] = 1
     states[l+x] = 1
-    if (values.length > bsy){
-      if (ene % 2==0){
-        await DelayNew()
-      }
-    }
-    else{
-      await DelayNew()
-    }
+    await DelayNew()
     ene++
 
   }
@@ -87,27 +80,13 @@ async function merge(arr, l, m, r){
 
             j++;
         }
-        if (values.length > bsy){
-          if (k%2==0){
-            await DelayNew()
-          }
-        }
-        else{
-          await DelayNew()
-        }
+        await DelayNew()
         k++;
 
     }
     while (i < n1) {
         arr[k] = L[i];
-        if (values.length > bsy){
-          if (k%2==0){
-            await DelayNew()
-          }
-        }
-        else{
-          await DelayNew()
-        }
+        await DelayNew()
         i++;
         k++;
         states[k] = 1
@@ -116,14 +95,7 @@ async function merge(arr, l, m, r){
 
     while (j < n2) {
         arr[k] = R[j];
-        if (values.length > bsy){
-          if (k%2==0){
-            await DelayNew()
-          }
-        }
-        else{
-          await DelayNew()
-        }
+        await DelayNew()
         j++;
         k++;
         states[k] = 1
@@ -154,24 +126,21 @@ async function quickSort(arr, start, end) {
     return;
   }
   let index = await partition(arr, start, end);
-  //states[index] = -1;
-
+  
   // Promise.all([quickSort(arr, start, index), quickSort(arr, index + 1, end)])
   await quickSort(arr, start, index)
   await quickSort(arr, index + 1, end)
 
 }
-
 async function partition(arr, low, high) {
-  let pivot = arr[low]
+  let pivot = arr[floor((low+high)/2)]
   let i=low-1
   let j=high+1
-
-
   while (true){
     
-    states[i] = 1;
-    states[j] = 1;
+    //states[i] = 1;
+    //states[j] = 1;
+    
     i++
     while (arr[i] < pivot){
       i++
@@ -787,6 +756,8 @@ async function QuickInsert(arr, start, end){
 
  
     // The utility function to insert the data
+    let toHeap = []
+    let toInsert = []
     async function dataAppend(temp)
     {
         values[n] = temp;
@@ -894,24 +865,32 @@ async function QuickInsert(arr, start, end){
     async function Partition(low, high)
     {
  
-        // pivot
-         let pivot = values[high];
- 
-        // Index of smaller element
-        let i = (low - 1);
-        for (let j = low; j <= high - 1; j++) {
- 
-            // If the current element is smaller
-            // than or equal to the pivot
-            if (values[j] <= pivot) {
- 
-                // increment index of smaller element
-                i++;
-                await swap(values, i, j);
-            }
+      let pivot = values[low]
+      let i=low-1
+      let j=high+1
+
+
+      while (true){
+        
+        states[i] = 1;
+        states[j] = 1;
+        i++
+        while (values[i] < pivot){
+          i++
         }
-        await swap(values, i + 1, high);
-        return (i + 1);
+
+        j--
+        while (values[j] > pivot){
+          j--
+        }
+        if (i >= j){
+          return j
+        }
+        await swap(values, i, j)
+
+
+
+        }
 
         
 
@@ -924,11 +903,14 @@ async function QuickInsert(arr, start, end){
     // depthLimit  --> recursion level
     async function sortDataUtil(begin, end, depthLimit)
     {
+      let canIn = true
         if (end - begin > 10) {
             if (depthLimit == 0) {
  
                 // if the recursion limit is
                 // occurred call heap sort
+                canIn = false
+                //toHeap.push([begin, end])
                 await HeapSort(begin, end);
                 return;
             }
@@ -944,13 +926,16 @@ async function QuickInsert(arr, start, end){
  
             // Separately sort elements before
             // partition and after partition
-            await sortDataUtil(begin, p - 1, depthLimit);
+            await sortDataUtil(begin, p, depthLimit);
             await sortDataUtil(p + 1, end, depthLimit);
         }
  
         else {
             // if the data set is small,
             // call insertion sort
+            if (canIn){
+            //toInsert.push([begin, end])
+            }
             await insertionSortIntro(begin, end);
         }
     }
@@ -959,13 +944,21 @@ async function QuickInsert(arr, start, end){
     // Introsort module
     async function sortDataIntro()
     {
- 
+        toInsert = []
+        toHeap = []
         // Initialise the depthLimit
         // as 2*log(length(data))
         let depthLimit = floor(2 * Math.floor(Math.log(n) /
                                   Math.log(2)));
  
         await sortDataUtil(0, n - 1, depthLimit);
+        // for (var i=0;i<toHeap.length;i++){
+        //   await HeapSort(values, toHeap[0], toHeap[1])
+        // }
+        // for (var i=0;i<toInsert.length;i++){
+        //   await insertSort(values, toInsert[0], toInsert[1])
+        // }
+        
     }
 
 
