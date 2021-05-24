@@ -39,6 +39,7 @@ function setup() {
   selection.option('Quick-Insertion Sort');
   //selection.option('Quick-Merge Sort');
   selection.option('Merge Sort');
+  selection.option('Grail Sort');
   selection.option('Bitonic Merge Sort');
   //selection.option('Merge-Heap Sort');
   selection.option('Weaved Merge Sort');
@@ -281,6 +282,10 @@ function Run() {
     canRun = false
     if (item == "Quick Sort"){
       quickSort(values, 0, values.length-1)
+      
+    }
+    if (item == "Grail Sort"){
+      grailSort(values, values.length)
     }
     if (item == "Bubble Sort"){
       bubbleSort(values)
