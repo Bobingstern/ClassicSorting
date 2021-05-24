@@ -137,6 +137,7 @@ async function mergeSort(arr, l, r){
     }
     let m = floor(l + (r-l)/2);
 
+
     await mergeSort(arr,l,m);
     await mergeSort(arr,m+1,r);
     await merge(arr,l,m,r);
@@ -1309,11 +1310,44 @@ async function WeavedMerge(array, tmp, length, residue, modulus) {
         for (let i = residue; i < length; i+=modulus) {
           array[i] = tmp[i]
           states[i] = 1
-          await sleep(delay)
+          await DelayNew()
         }
     }
 
 
+//Diamond Sort
+async function DiamondSort(arr, start, stop, merge){
+        if (stop - start == 2) {
+            if (arr[start] > arr[stop-1]){
+              await swap(arr, start, stop-1)
+            }
+        } else if (stop - start >= 3) {
+            let div = (stop - start) / 4;
+            let mid = floor((stop - start) / 2 + start)
+            if (merge) {
+                await DiamondSort(arr, start, mid, true);
+                await DiamondSort(arr, mid, stop, true);
+            }
+            await DiamondSort(arr, floor(div) + start, floor(div * 3) + start, false);
+            await DiamondSort(arr, start, mid, false);
+            await DiamondSort(arr, mid, stop, false);
+            await DiamondSort(arr, floor(div) + start, floor(div * 3) + start, false);
+
+          }
+}
 
 
+//Grail
+let anim = []
+async function grailSort(array, length){
+  let comp = new GrailComparator()
+  let extBuffer = new Array(512)
+  let grail = new GrailSort(comp)
+  let a = [...array]
+  grail.grailCommonSort(array, 0, length, extBuffer, extBuffer.length)
+  for (var i=0;i<anim.length;i++){
+    //await swap(array, anim[i][0], anim[i][1])
+  }
+
+}
 
