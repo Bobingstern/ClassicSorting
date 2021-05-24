@@ -72,7 +72,7 @@ class GrailSort {
     async grailBlockSwap(array, a, b, blockLen) {
         for(let i = 0; i < blockLen; i++) {
             await this.grailSwap(array, a + i, b + i);
-            await sleep(delay)
+            await DelayNew()
         }
     }
 
@@ -90,7 +90,7 @@ class GrailSort {
             } else {
                 for (let i = 0; i < copyLen; i++) {
                     destArray[destPos + i] = srcArray[srcPos + i];
-                    await sleep(delay)
+                    await DelayNew()
                 }
             }
         }
@@ -196,7 +196,7 @@ class GrailSort {
             }
             // Move on and test the next key...
             currentKey++;
-            await sleep(delay)
+            await DelayNew()
         }
         
         // Bring however many keys we found back to the beginning of our array,
@@ -245,14 +245,14 @@ class GrailSort {
                 states[left-2] = 1
                 states[right-2] = 1
             }
-            await sleep(delay)
+            await DelayNew()
         }
         
         let left = start + index - 1;
         if(left < start + length) {
             array[left - 2] = array[left];
             states[left-2] = 1
-            await sleep(delay)
+            await DelayNew()
         }
     }
     
@@ -348,7 +348,7 @@ class GrailSort {
                 states[left] = 1
                 left++;
             }
-            await sleep(delay)
+            await DelayNew()
             buffer++;
         }
         
@@ -359,7 +359,7 @@ class GrailSort {
                 states[left] = 1
                 buffer++;
                 left++;
-                await sleep(delay)
+                await DelayNew()
             }
         }
     }
@@ -428,7 +428,7 @@ class GrailSort {
                     array[mergeIndex + offset - mergeLen] = array[mergeIndex + offset];
                     states[mergeIndex + offset - mergeLen] = 1
                     states[mergeIndex+offset] = 1
-                    await sleep(delay)
+                    await DelayNew()
                 }
             }
     
@@ -523,7 +523,7 @@ class GrailSort {
             array[index] = array[index - bufferLen];
             states[index] = 1
             states[index - bufferLen] =1 
-            await sleep(delay)
+            await DelayNew()
         }
     }
     
@@ -552,7 +552,7 @@ class GrailSort {
             array[buffer] = array[leftOvers];
             states[buffer] = 1
             states[leftOvers] = 1
-            await sleep(delay)
+            await DelayNew()
         }
     }
     
@@ -713,7 +713,7 @@ class GrailSort {
                     states[right] = 1
                     right++;
                 }
-                await sleep(delay)
+                await DelayNew()
                 buffer++;
             }
         }
@@ -727,7 +727,7 @@ class GrailSort {
                     array[buffer] = array[right];
                     right++;
                 }
-                await sleep(delay)
+                await DelayNew()
                 buffer++;
             }            
         }
@@ -1196,7 +1196,7 @@ class GrailSort {
                 }
 
                 await this.grailCombineBlocks(array, start, start + bufferEnd, length - bufferEnd, bufferLen, currentBlockLen, scrollingBuffer);
-                await sleep(delay)
+                await DelayNew()
             }
             
             await this.grailInsertSort(array, start, bufferEnd);
