@@ -328,7 +328,7 @@ function Run() {
       radixSort(values)
     }
     if (item == "Insertion Sort"){
-      insertionSortRecursive(values, values.length)
+      insertSort(values, 0, values.length)
 
     }
     if (item == "Heap Sort"){
@@ -345,6 +345,7 @@ function Run() {
     }
     if (item == "IntroSort"){
       sortDataIntro()
+      insertSort(values, 0, values.length)
 
     }
     if (item == "Weave Merge Sort"){
