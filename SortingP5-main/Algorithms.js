@@ -270,13 +270,13 @@ let base = 4
 async function QuadBuild(output){
   let counters = []
   let countersOriginal = []
+  showData = "Build\nArray"
   counters[0] = ceil((values.length-1)/base)
   for (var i=1;i<base;i++){
     counters[i] = counters[i-1] + ceil((values.length-1)/base)
   }
   counters[base-1] = values.length
   countersOriginal = [...counters]
-  console.log(counters)
   let c = 1
   while(counters[0] > 0){
     counters[0]--
@@ -350,10 +350,9 @@ async function countingSort(arr, size, place){
 
     states[i] = 1
     //arr[i] = output[i];
-    showData = "Building\nArray"
-    if (i%2 == 0){
-      await DelayNew()
-    }
+    showData = "Checking\nArray"
+    await DelayNew()
+    
   }
 
   await QuadBuild(output)
