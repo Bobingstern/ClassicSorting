@@ -48,7 +48,9 @@ function setup() {
   selection.option('Weave Merge Sort');
   selection.option('Shaker Merge Sort');
   selection.option('Tim Sort');
-  selection.option('Radix Sort');
+  selection.option('Radix Sort Base 4');
+  selection.option('Radix Sort Base 8');
+  selection.option('Radix Sort Base 10');
 
   selection.option('Insertion Sort');
   selection.option('Selection Sort');
@@ -338,7 +340,16 @@ async function Run() {
       timSort(values, values.length)
     }
 
-    if (item == "Radix Sort"){
+    if (item == "Radix Sort Base 4"){
+      base = 4
+      radixSort(values)
+    }
+    if (item == "Radix Sort Base 8"){
+      base = 8
+      radixSort(values)
+    }
+    if (item == "Radix Sort Base 10"){
+      base = 10
       radixSort(values)
     }
     if (item == "Insertion Sort"){
