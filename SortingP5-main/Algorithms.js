@@ -29,6 +29,21 @@ async function DelayNew(){
   nes++
 }
 
+async function DelayDynamic(){
+  if (values.length > bsy){
+    if (nes % floor(values.length/bsy) == 0){
+      await sleep(1);
+      nes = 0
+    }
+  }
+  else{
+    await sleep(1);
+  }
+  nes++
+}
+
+
+
 //Merge Sort
 
 async function merge(arr, l, m, r){
@@ -51,6 +66,7 @@ async function merge(arr, l, m, r){
   y = 0
   let ene = 0
   while (y < n2 || x < n1){
+    showData = "Checking"
     if (y < n2){
       y++
     }
@@ -80,12 +96,14 @@ async function merge(arr, l, m, r){
 
             j++;
         }
+        showData = "Merging"
         await DelayNew()
         k++;
 
     }
     while (i < n1) {
         arr[k] = L[i];
+        showData = "Merging\nLeftovers"
         await DelayNew()
         i++;
         k++;
@@ -95,6 +113,7 @@ async function merge(arr, l, m, r){
 
     while (j < n2) {
         arr[k] = R[j];
+        showData = "Merging\nLeftovers"
         await DelayNew()
         j++;
         k++;
@@ -125,9 +144,11 @@ async function quickSort(arr, start, end) {
   if (start >= end) {
     return;
   }
+  showData = "Recursing"
   let index = await partition(arr, start, end);
   
   // Promise.all([quickSort(arr, start, index), quickSort(arr, index + 1, end)])
+  
   await quickSort(arr, start, index)
   await quickSort(arr, index + 1, end)
 
@@ -136,6 +157,7 @@ async function partition(arr, low, high) {
   let pivot = arr[floor((low+high)/2)]
   let i=low-1
   let j=high+1
+  showData = "partitioning"
   while (true){
     
     //states[i] = 1;
@@ -180,6 +202,7 @@ async function insertionSort(arr, left, right)
         {
             arr[j+1] = arr[j];
             states[j+1] = 1
+            showData = "Inserting\nSections"
             await DelayNew()
             j--;
         }
@@ -229,6 +252,7 @@ async function timSort(arr, n)
             // arr[mid+1....right]
               if(mid < right)
                 await merge(arr, left, mid, right);
+
         }
     }
 }
@@ -236,6 +260,11 @@ async function timSort(arr, n)
 
 
 //----
+
+
+
+
+//Radix Sort
 let base = 4
 
 async function QuadBuild(output){
@@ -345,6 +374,8 @@ async function radixSort(arr){
     await countingSort(arr, size, i);
   }
 }
+
+
 //----
 
 //Recursive Insetrtion
@@ -379,7 +410,7 @@ async function insertionSortRecursive(arr, n)
 //Heap sort
 
 async function heapify(arr, n, i){
-
+    
     let largest = i; // Initialize largest as root
     let l = 2 * i + 1; // left = 2*i + 1
     let r = 2 * i + 2; // right = 2*i + 2
@@ -421,7 +452,7 @@ async function heapifyShuffle(arr, n, i){
  
     // If largest is not root
     if (largest != i) {
-        await swapNoDelay(arr, i, largest);
+        await swap(arr, i, largest);
         states[i] = 0
  
         // Recursively heapify the affected sub-tree
@@ -433,6 +464,7 @@ async function heapSort(arr, n)
 {
     // Build heap (rearrange array)
     for (let i = n / 2 - 1; i >= 0; i--){
+        showData = "Building Heap"
         await heapify(arr, n, i);
 
     }
@@ -440,6 +472,8 @@ async function heapSort(arr, n)
     // One by one extract an element from heap
     for (let i = n - 1; i > 0; i--) {
         // Move current root to end
+        showData = "Re-Building"
+
         await swap(arr, 0, i);
 
  
@@ -462,6 +496,7 @@ async function ShellSort(arr, n){
         {
             // add a[i] to the elements that have been gap sorted
             // save a[i] in temp and make a hole at position i
+            showData = "Gap is\n"+gap
             var temp = arr[i];
             states[i] = 1
   
@@ -541,6 +576,7 @@ async function combSort(arr)
         
           front += 1;
           back += 1;
+          showData = "Gap is\n"+gap
       }
       iteration_count += 1;
   }
@@ -690,6 +726,7 @@ async function GravitySort(arr, l, h){
     }
   }
   for (let i = max - 1; i >= 0; i--) {
+    showData = "Magic"
     let sum = 0;
     for (let j = 0; j < sz; j++) {
       if (abacus[j][i]) {
@@ -784,11 +821,9 @@ async function QuickInsert(arr, start, end){
 
 
  
-//IntroSort
-
-
- 
     // The utility function to insert the data
+    let toHeap = []
+    let toInsert = []
     async function dataAppend(temp)
     {
         values[n] = temp;
@@ -818,7 +853,7 @@ async function QuickInsert(arr, start, end){
             }
  
             values[begin + i - 1] = values[begin + child - 1];
-            await sleep(delay)
+            await DelayNew()
             i = child;
         }
         values[begin + i - 1] = temp;
@@ -865,11 +900,11 @@ async function QuickInsert(arr, start, end){
             while (j > left && values[j - 1] > key) {
               states[j] = 1
                 values[j] = values[j - 1];
-                await sleep(delay)
+                await DelayNew()
                 j--;
             }
             values[j] = key;
-            await sleep(delay)
+            await DelayNew()
         }
     }
  
@@ -896,24 +931,32 @@ async function QuickInsert(arr, start, end){
     async function Partition(low, high)
     {
  
-        // pivot
-         let pivot = values[high];
- 
-        // Index of smaller element
-        let i = (low - 1);
-        for (let j = low; j <= high - 1; j++) {
- 
-            // If the current element is smaller
-            // than or equal to the pivot
-            if (values[j] <= pivot) {
- 
-                // increment index of smaller element
-                i++;
-                await swap(values, i, j);
-            }
+      let pivot = values[low]
+      let i=low-1
+      let j=high+1
+
+
+      while (true){
+        
+        states[i] = 1;
+        states[j] = 1;
+        i++
+        while (values[i] < pivot){
+          i++
         }
-        await swap(values, i + 1, high);
-        return (i + 1);
+
+        j--
+        while (values[j] > pivot){
+          j--
+        }
+        if (i >= j){
+          return j
+        }
+        await swap(values, i, j)
+
+
+
+        }
 
         
 
@@ -926,11 +969,14 @@ async function QuickInsert(arr, start, end){
     // depthLimit  --> recursion level
     async function sortDataUtil(begin, end, depthLimit)
     {
+      let canIn = true
         if (end - begin > 10) {
             if (depthLimit == 0) {
  
                 // if the recursion limit is
                 // occurred call heap sort
+                canIn = false
+                //toHeap.push([begin, end])
                 await HeapSort(begin, end);
                 return;
             }
@@ -946,13 +992,16 @@ async function QuickInsert(arr, start, end){
  
             // Separately sort elements before
             // partition and after partition
-            await sortDataUtil(begin, p - 1, depthLimit);
+            await sortDataUtil(begin, p, depthLimit);
             await sortDataUtil(p + 1, end, depthLimit);
         }
  
         else {
             // if the data set is small,
             // call insertion sort
+            if (canIn){
+            //toInsert.push([begin, end])
+            }
             await insertionSortIntro(begin, end);
         }
     }
@@ -961,14 +1010,23 @@ async function QuickInsert(arr, start, end){
     // Introsort module
     async function sortDataIntro()
     {
- 
+        toInsert = []
+        toHeap = []
         // Initialise the depthLimit
         // as 2*log(length(data))
         let depthLimit = floor(2 * Math.floor(Math.log(n) /
                                   Math.log(2)));
  
         await sortDataUtil(0, n - 1, depthLimit);
+        // for (var i=0;i<toHeap.length;i++){
+        //   await HeapSort(values, toHeap[0], toHeap[1])
+        // }
+        // for (var i=0;i<toInsert.length;i++){
+        //   await insertSort(values, toInsert[0], toInsert[1])
+        // }
+        
     }
+
 
 //Quick-Merge Sort
 let RUNQ = 64
@@ -1339,14 +1397,102 @@ async function DiamondSort(arr, start, stop, merge){
 
 
 //Grail
-let anim = []
 async function grailSort(array, length){
   let comp = new GrailComparator()
   let extBuffer = new Array(512)
   let grail = new GrailSort(comp)
-  let a = [...array]
   //grail.grailCommonSort(array, 0, length, extBuffer, extBuffer.length)
   grail.grailSortInPlace(array, 0, array.length)
 
 }
 
+
+async function grailSortOut(array, length){
+  let comp = new GrailComparator()
+  let extBuffer = new Array(512)
+  let grail = new GrailSort(comp)
+  grail.grailCommonSort(array, 0, length, extBuffer, extBuffer.length)
+  //grail.grailSortInPlace(array, 0, array.length)
+
+}
+
+
+//Binary Insertion
+async function binarySearch(a, item,
+                 low, high)
+{
+
+    if (high <= low){
+        if(item > a[low]){
+          return (low+1)
+        }
+        else{
+          return low
+        }
+    }
+ 
+    let mid = floor((low + high) / 2);
+    states[mid] = 1
+    states[low] =  1
+    states[high] = 1
+    await DelayNew()
+    if (item == a[mid]){
+        return mid + 1;
+    }
+ 
+    if (item > a[mid]){
+        return await binarySearch(a, item,
+                            mid + 1, high);
+    }
+    return await binarySearch(a, item, low, mid - 1);
+}
+ 
+// Function to sort an array a[] of size 'n'
+async function insertionSortBinary(a, n)
+{
+    let i, loc, j, k, selected;
+ 
+    for (i = 1; i < n; ++i)
+    {
+        j = i - 1;
+        selected = a[i];
+ 
+        // find location where selected sould be inseretd
+        loc = await binarySearch(a, selected, 0, j);
+ 
+        // Move all elements after location to create space
+        while (j >= loc)
+        {
+            await DelayNew()
+            a[j + 1] = a[j];
+            states[j+1] = 1
+            states[j] = 1
+            j--;
+        }
+        a[j + 1] = selected;
+    }
+}
+
+
+//Selection Sort finally
+async function selectionSort(arr, n) 
+{ 
+    let i, j, min_idx; 
+  
+    // One by one move boundary of unsorted subarray 
+    for (i = 0; i < n-1; i++) 
+    { 
+        // Find the minimum element in unsorted array 
+        min_idx = i; 
+        for (j = i+1; j < n; j++){
+          if (arr[j] < arr[min_idx]){ 
+              min_idx = j; 
+              states[j] = 1
+              await DelayNew()
+            }
+        }
+  
+        // Swap the found minimum element with the first element 
+        await swap(arr, min_idx, i); 
+    } 
+} 
