@@ -236,9 +236,37 @@ async function timSort(arr, n)
 
 
 //----
-
-//Radix Sort
 let base = 4
+
+async function QuadBuild(output){
+  let counters = []
+  let countersOriginal = []
+  counters[0] = ceil((values.length-1)/base)
+  for (var i=1;i<base;i++){
+    counters[i] = counters[i-1] + ceil((values.length-1)/base)
+  }
+  counters[base-1] = values.length
+  countersOriginal = [...counters]
+  console.log(counters)
+  let c = 1
+  while(counters[0] > 0){
+    counters[0]--
+    states[counters[0]] = 1
+    values[counters[0]] = output[counters[0]]
+    for (var j=0;j<counters.length;j++){
+
+      if (counters[j] > 0 && counters[j] >= countersOriginal[j-1]){
+        counters[j]--
+        states[counters[j]] = 1
+        values[counters[j]] = output[counters[j]]
+        await DelayNew()
+      }
+    }
+
+  }
+}
+
+
 async function countingSort(arr, size, place){
   
   let output = new Array(size + 1).fill(0);
@@ -251,11 +279,13 @@ async function countingSort(arr, size, place){
       const num = floor(arr[i] / place) % base;
       
       freq[num]++;
+      showData = "Counting\nelements"
   }
   
   // Calculate cummulative count
   for (let i = 1; i < base; i++){
       freq[i] += freq[i - 1];
+      showData = "Cummulative\nCount"
   }
 
   // Place the elements in sorted order
@@ -263,9 +293,9 @@ async function countingSort(arr, size, place){
   for (let i = size - 1; i >= 0; i--) {
       const num = floor(arr[i] / place) % base;
       output[freq[num] - 1] = arr[i];
-      states[freq[num] - 1] = 1
-      
-      await DelayNew()
+      //states[freq[num] - 1] = 1
+      showData = "Generating\nOutput"
+      //await DelayNew()
 
       freq[num]--;
   }
@@ -287,18 +317,19 @@ async function countingSort(arr, size, place){
   
   //Copy the output array
   
-
-
-
-
   for (let i = 0; i < size; i++){
 
     states[i] = 1
-    arr[i] = output[i];
+    //arr[i] = output[i];
+    showData = "Building\nArray"
     if (i%2 == 0){
       await DelayNew()
     }
   }
+
+  await QuadBuild(output)
+
+  
 
   
 
@@ -314,8 +345,6 @@ async function radixSort(arr){
     await countingSort(arr, size, i);
   }
 }
-
-
 //----
 
 //Recursive Insetrtion
