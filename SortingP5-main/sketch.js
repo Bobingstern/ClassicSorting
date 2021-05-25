@@ -16,6 +16,7 @@ let shuffType
 let n
 let muted
 let mute
+let showData = ""
 
 function mousePressed(){
   
@@ -40,6 +41,7 @@ function setup() {
   //selection.option('Quick-Merge Sort');
   selection.option('Merge Sort');
   selection.option('Grail Sort');
+  selection.option('Grail Sort Out-of-Place');
   selection.option('Bitonic Merge Sort');
   //selection.option('Merge-Heap Sort');
   selection.option('Weaved Merge Sort');
@@ -49,6 +51,7 @@ function setup() {
   selection.option('Radix Sort');
 
   selection.option('Insertion Sort');
+  selection.option('Selection Sort');
   selection.option('Heap Sort');
   selection.option('Shell Sort');
   selection.option('Comb Sort');
@@ -150,9 +153,8 @@ async function shuffleArr(arr, e, x){
     for (var i=0;i<e;i++){
       let a = i
       let b = round(random(i, arr.length-1))
-      if (i % 5 == 0){
-      }
-
+      
+      await DelayDynamic()
       let temp = arr[i];
       arr[a] = arr[b];
       arr[b] = temp;
@@ -163,8 +165,7 @@ async function shuffleArr(arr, e, x){
         let a = round(random(0, arr.length-1))
         let b = round(random(0, arr.length-1))
         if (a != b){
-          if (i % 5 == 0){
-          }
+          await DelayDynamic()
           let temp = arr[a];
           arr[a] = arr[b];
           arr[b] = temp;
@@ -174,7 +175,7 @@ async function shuffleArr(arr, e, x){
 }
 
 async function makeVals(){
-
+  showData = "Shuffling"
   canRun = true
   for (var i=0;i<states.length;i++){
       states[i] = -1
@@ -297,6 +298,9 @@ async function Run() {
     if (item == "Grail Sort"){
       grailSort(values, values.length)
     }
+    if (item == "Grail Sort Out-of-Place"){
+      grailSortOut(values, values.length)
+    }
     if (item == "Bubble Sort"){
       bubbleSort(values)
     }
@@ -339,6 +343,10 @@ async function Run() {
     }
     if (item == "Insertion Sort"){
       insertionSortRecursive(values, values.length)
+
+    }
+    if (item == "Selection Sort"){
+      selectionSort(values, values.length)
 
     }
     if (item == "Heap Sort"){
@@ -389,6 +397,7 @@ function draw() {
   text("Shuffle", 480, 50)
   text("Start", 720, 50)
   text("Mute Sound", 830, 50)
+  //text(showData, 1100, 50)
   pop()
   for (let i = 0; i < values.length; i++) {
     noStroke();
@@ -414,7 +423,14 @@ function draw() {
   }
   if (is_array_sorted(values) || canRun){
     osc.fade(0, 0.1)
+    
   }
+  if (is_array_sorted(values)){
+    showData = "Done"
+  }
+ 
+
+
 
 
 }
