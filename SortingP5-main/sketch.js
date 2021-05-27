@@ -17,7 +17,8 @@ let n
 let muted
 let mute
 let showData = ""
-
+let visualSelector
+let visualizer = 0
 function mousePressed(){
   
 }
@@ -78,10 +79,17 @@ function setup() {
   shuffType.option("Scrambled Head")
   shuffType.selected('Normal Shuffle');
 
+
+  visualSelector = createSelect()
+  visualSelector.position(730, 60)
+  visualSelector.option("Bar Graph")
+  visualSelector.option("Dots")
+  visualSelector.option("Rainbow")
+  visualSelector.selected("Bar Graph")
   
 
   runButton = createButton("Start")
-  runButton.position(730, 60)
+  runButton.position(900, 60)
   runButton.mousePressed(Run)
 
   upButton = createButton("+Size")
@@ -106,10 +114,10 @@ function setup() {
   shuff.mousePressed(makeVals)
 
   muted = createCheckbox('mute sound', false)
-  muted.position(900, 60)
+  muted.position(1100, 60)
   muted.changed(checkED)
   makeVals()
-
+  ew = [...values]
 }
 function checkED() {
   if (this.checked()) {
@@ -278,7 +286,7 @@ async function makeVals(){
   osc.fade(0, 0.1)
     
 }
-
+let now = new Date()
 async function Run() {
   nes = 0
   if (values.length % 2 != 0){
@@ -291,11 +299,12 @@ async function Run() {
                                   Math.log(2)));
   userStartAudio();
   let item = selection.value();
+  ew = [...values]
   if (canRun){
     canRun = false
     if (item == "Quick Sort"){
-      quickSort(values, 0, values.length-1)
       
+      quickSort(values, 0, values.length-1)      
     }
     if (item == "Grail Sort"){
       grailSort(values, values.length)
@@ -393,6 +402,15 @@ async function Run() {
 
 function draw() {
   // put drawing code here
+  if (visualSelector.value() == "Bar Graph"){
+    visualizer = 0
+  }
+  else if (visualSelector.value() == "Dots"){
+    visualizer = 1
+  }
+  else if (visualSelector.value() == "Rainbow"){
+    visualizer = 2
+  }
   background(56);
   push()
   fill(0)
@@ -406,32 +424,81 @@ function draw() {
   text("Algorithm", 10, 50)
   text("Size: "+values.length, 320, 50)
   text("Shuffle", 480, 50)
-  text("Start", 720, 50)
-  text("Mute Sound", 830, 50)
+  text("Start", 890, 50)
+  text("Mute Sound", 1030, 50)
+  text("Visualizer", 720, 50)
   //text(showData, 1100, 50)
   pop()
-  for (let i = 0; i < values.length; i++) {
-    noStroke();
-    if (states[i] == 0) {
-      fill('#E0777D');
-    } else if (states[i] == 1) {
-      if (!mute){
-        let key = (map(values[i], 1, height, 1, 41))
-        playNote(key+40)  
-      }
-      else{
-        osc.fade(0, 0.1)
+
+  if (visualizer == 0){
+    for (let i = 0; i < values.length; i++) {
+      noStroke();
+      if (states[i] == 0) {
+        fill('#E0777D');
+      } else if (states[i] == 1) {
+        if (!mute){
+          let key = (map(values[i], 1, height, 1, 41))
+          playNote(key+40)  
+        }
+        else{
+          osc.fade(0, 0.1)
+        }
+
+        fill(255, 0, 0);
+      } else {
+        fill(255);
+        //osc.fade(0, 1)
       }
 
-      fill(255, 0, 0);
-    } else {
-      fill(255);
-      //osc.fade(0, 1)
+      rect(i * w, height - values[i], w, values[i]);
+      states[i] = -1
     }
-
-    rect(i * w, height - values[i], w, values[i]);
-    states[i] = -1
   }
+  else if (visualizer == 1){
+    for (let i = 0; i < values.length; i++) {
+      noStroke();
+      if (states[i] == 0) {
+        stroke('#E0777D');
+
+      } else if (states[i] == 1) {
+        if (!mute){
+          let key = (map(values[i], 1, height, 1, 41))
+          playNote(key+40)  
+        }
+        else{
+          osc.fade(0, 0.1)
+        }
+
+        
+        push()
+        fill(255, 0, 0);
+        noFill()
+        strokeWeight(3)
+        stroke(255, 0, 0)
+        rect(i*w-w, height-values[i]-w, w*2, w*2)
+        pop()
+      } else {
+        fill(255);
+        //osc.fade(0, 1)
+      }
+
+      //rect(i * w, height - values[i], w, values[i]);
+      circle(i*w, height-values[i], w)
+      states[i] = -1
+    }
+  }
+  else if (visualizer == 2){
+    let off = 130
+    for (var i=0;i<values.length;i++){
+      colorMode(HSB)
+
+      fill(values[i]*255/height+off, values[i]*255/height+off, values[i]*255/height+off)
+      rect(i*w, 90, w, height)
+    }
+  }
+
+
+
   if (is_array_sorted(values) || canRun){
     osc.fade(0, 0.1)
     
