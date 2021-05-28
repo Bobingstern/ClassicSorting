@@ -824,7 +824,7 @@ async function QuickInsert(arr, start, end){
     async function dataAppend(temp)
     {
         values[n] = temp;
-        await sleep(delay)
+        await DelayNew()
         n++;
     }
  
@@ -850,7 +850,7 @@ async function QuickInsert(arr, start, end){
             }
  
             values[begin + i - 1] = values[begin + child - 1];
-            await sleep(delay)
+            await DelayNew()
             i = child;
         }
         values[begin + i - 1] = temp;
@@ -897,11 +897,11 @@ async function QuickInsert(arr, start, end){
             while (j > left && values[j - 1] > key) {
               states[j] = 1
                 values[j] = values[j - 1];
-                await sleep(delay)
+                await DelayNew()
                 j--;
             }
             values[j] = key;
-            await sleep(delay)
+            await DelayNew()
         }
     }
  
