@@ -1560,6 +1560,9 @@ async function backmerge(arr, arr1, l1, arr2, l2) {
             for(let j = i + r; j < l; j += r) {
                 if(arr[a + q] > arr[a + j]) {
                     q = j;
+                    await DelayNew()
+                    states[a+q] = 1
+                    states[a+j] = 1
                 }
             }       
             if(q != i) {
@@ -1575,7 +1578,6 @@ async function backmerge(arr, arr1, l1, arr2, l2) {
 
     async function rbnd(len) {
         len = floor(len / 2);
-        console.log(len)
         let k = 0;
         for(let i = 1; i < len; i *= 2) {
             k++;
