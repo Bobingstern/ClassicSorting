@@ -1,6 +1,12 @@
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+let noDel = false
+
+
+async function sleep(ms) {
+  if (!noDel){
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  
 }
 let nes = 0
 let bsy = 200
@@ -582,7 +588,6 @@ async function combSort(arr)
 }
 
 
-///Introsort
 
 //Merge sort in place
 let es = 0
@@ -820,6 +825,7 @@ async function QuickInsert(arr, start, end){
 
 
  
+ 
     // The utility function to insert the data
     async function dataAppend(temp)
     {
@@ -1001,6 +1007,7 @@ async function QuickInsert(arr, start, end){
  
         await sortDataUtil(0, n - 1, depthLimit);
     }
+
 //Quick-Merge Sort
 let RUNQ = 64
 async function quickMergeSort(arr, n)
@@ -1469,3 +1476,177 @@ async function selectionSort(arr, n)
         await swap(arr, min_idx, i); 
     } 
 } 
+
+//Room Sort
+async function insertTo(array, a, b) {
+        let val = array[a];
+        a--;
+        while (a >= b && array[a] > val) {
+          array[a+1] = array[a]
+          states[a+1] = 1
+          states[a] = 1
+            a--;
+            await DelayNew()
+        }
+        array[a+1] = val
+    }
+    
+    
+    async function roomSort(array, currentLength) {
+        let roomLen = floor(Math.sqrt(currentLength)) + 1;
+
+        let end, i;
+        for (end = currentLength; end > roomLen; end -= roomLen) {
+          await insertSort(array, 0, roomLen)
+            for (i = roomLen; i < end; i++) {
+                await insertTo(array, i, i - roomLen);
+            }
+        }
+        await insertSort(array, 0, end)
+    }
+
+
+//---- Andrey Sort
+
+async function aSort(arr, a, b){
+  while (b>1){
+    let k = 0
+    for (var i=1;i<b;i++){
+      if (arr[a+k] > arr[a+i]){
+        k = i
+      }
+    }
+    await swap(arr, a, a+k)
+    a++
+    b--
+  }
+}
+
+async function aSwap(arr, arr1, arr2, l){
+  while (l-- > 0){
+    await swap(arr, arr1++, arr2++)
+  }
+}
+
+
+async function backmerge(arr, arr1, l1, arr2, l2) {
+        let arr0 = arr2 + l1;
+        for(;;) {
+            if(arr[arr1] > arr[arr2]) { 
+                await swap(arr, arr1--, arr0--);
+                if(--l1 == 0) {
+                    return 0;
+                }
+            }
+            else {
+                await swap(arr, arr2--, arr0--);
+                if(--l2 == 0) {
+                    break;
+                }
+            }
+        }
+        let res = l1;
+        do {
+            await swap(arr, arr1--, arr0--);
+        } while(--l1 != 0);
+        return res;
+    }
+
+
+ async function rmerge(arr, a, l, r) {
+        for(let i = 0; i < l; i += r) {
+            // select smallest arr[p0+n*r]
+            let q = i;
+            for(let j = i + r; j < l; j += r) {
+                if(arr[a + q] > arr[a + j]) {
+                    q = j;
+                }
+            }       
+            if(q != i) {
+                await aSwap(arr, a + i, a + q, r); // swap it with current position
+            }
+            if(i != 0) {
+                await aSwap(arr, a + l, a + i, r);  // swap current position with buffer
+                await backmerge(arr, a + (l + r - 1), r, a + (i - 1), r); // buffer :merge: arr[i-r..i) -> arr[i-r..i+r)
+            }
+        }
+    }
+
+
+    async function rbnd(len) {
+        len = floor(len / 2);
+        console.log(len)
+        let k = 0;
+        for(let i = 1; i < len; i *= 2) {
+            k++;
+        }
+        len /= k;
+
+        for(k = 1; k <= len; k *= 2){;
+          return k
+        };
+    }
+
+
+
+async function msort(arr, a, len) {
+        if(len < 12) {
+            await aSort(arr, a, len);
+            return;
+        }
+        
+        let r = await rbnd(len);
+        let lr = floor((len / r - 1) * r);
+        
+        for(let p = 2; p <= lr; p += 2) {
+            if(arr[a + (p - 2)] > arr[a + (p - 1)]) {
+                await swap(arr, a + (p - 2), a + (p - 1));
+            }
+            if((p & 2) != 0) {
+                continue;
+            }
+            
+            await aSwap(arr, a + (p - 2), a + p, 2);
+            
+            let m = len - p;
+            let q = 2;
+            
+            for(;;) {
+                let q0 = floor(2 * q);
+                if(q0 > m || (p & q0) != 0) {
+                    break;
+                }
+                await backmerge(arr, a + (p - q - 1), q, a + (p + q - 1), q);
+                q = q0;
+            }
+            
+            await backmerge(arr, a + (p + q - 1), q, a + (p - q - 1), q);
+            let q1 = q;
+            q *= 2;
+            
+            while((q & p) == 0) {
+                q *= 2;
+                await rmerge(arr, a + (p - q), q, q1);
+            }
+        }
+        
+        let q1 = 0;
+        for(let q = r; q< lr; q *= 2) {
+            if((lr & q) != 0) {
+                q1 += q;
+                if(q1 != q) {
+                    await rmerge(arr, a + (lr - q1), q1, r);
+                }
+            }
+        }
+        
+        let s = len - lr;
+        await msort(arr, a + lr, s);
+        await aSwap(arr, a, a + lr, s);
+        s += await backmerge(arr, a + (s - 1), s, a + (lr - 1), lr - s);
+        await msort(arr, a, s);
+    }
+    
+
+
+
