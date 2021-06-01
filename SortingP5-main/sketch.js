@@ -40,6 +40,7 @@ function setup() {
   selection.option('Dual-Pivot Quick Sort');
   selection.option('Quick-Insertion Sort');
   //selection.option('Quick-Merge Sort');
+  selection.option('Andrey Sort');
   selection.option('Merge Sort');
   selection.option('Grail Sort');
   selection.option('Grail Sort Out-of-Place');
@@ -335,6 +336,10 @@ async function Run() {
     }
     if (item == "Merge Sort"){
       mergeSort(values, 0, values.length-1)
+
+    }
+    if (item == "Andrey Sort"){
+      msort(values, 0, values.length)
 
     }
     if (item == "Weaved Merge Sort"){
