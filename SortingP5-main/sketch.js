@@ -41,6 +41,7 @@ function setup() {
   selection.option('Quick-Insertion Sort');
   //selection.option('Quick-Merge Sort');
   selection.option('Andrey Sort');
+  selection.option('Buffered Partition Sort');
   selection.option('Merge Sort');
   selection.option('Grail Sort');
   selection.option('Grail Sort Out-of-Place');
@@ -73,11 +74,12 @@ function setup() {
   shuffType.option('Reverse Shuffle');
   shuffType.option("Heapifyed Shuffle")
   shuffType.option("Almost Sorted")
-  //shuffType.option("Quick Sort Killer")
+  shuffType.option("Quick Sort Killer")
   shuffType.option("Sine Wave")
   shuffType.option("Mountain")
   shuffType.option("Scrambled Tail")
   shuffType.option("Scrambled Head")
+  shuffType.option("Final Radix Pass")
   shuffType.selected('Normal Shuffle');
 
 
@@ -86,6 +88,7 @@ function setup() {
   visualSelector.option("Bar Graph")
   visualSelector.option("Dots")
   visualSelector.option("Rainbow")
+  //visualSelector.option("Disparity Circle")
   visualSelector.selected("Bar Graph")
   
 
@@ -254,7 +257,21 @@ async function makeVals(){
       values[b] = temp;
 
     }
+
+    
   }
+
+  if (item == "Final Radix Pass"){
+      noDel = true
+      let size = values.length
+      let MAX = max(...values);
+      let b = 4
+      for(let i = 1; parseInt(MAX / i) > 2; i *= b){
+        await countingSort(values, size, i); 
+        console.log(parseInt(MAX/i))
+      }
+      noDel = false
+    }
 
 
   if (item == "Mountain"){
@@ -278,11 +295,15 @@ async function makeVals(){
   }
 
   if (item == "Quick Sort Killer"){
-    let currl = values.length
+    let currl = values.length-1
      for (var j=currl-currl%2-2, i=j;i>=0;i-=2,j--){
         swap(values, i, j)
+        if (values[i] == 0){
+          
+        }
+        //console.log(values[i], i)
      } 
-     
+     //console.log(values[floor((values.length-1)/2)])
   }
   osc.fade(0, 0.1)
     
@@ -328,6 +349,9 @@ async function Run() {
     if (item == "Quick-Insertion Sort"){
       QISort()
     }
+    if (item == "Buffered Partition Sort"){
+      BPM(values, values.length)
+    }
     if (item == "Quick-Merge Sort"){
       quickMergeSort(values, values.length)
     }
@@ -362,8 +386,8 @@ async function Run() {
       base = 8
       radixSort(values)
     }
-    if (item == "Radix Sort Base 10"){
-      base = 10
+    if (item == "Radix Sort Base 12"){
+      base = 12
       radixSort(values)
     }
     if (item == "Insertion Sort"){
@@ -415,6 +439,9 @@ function draw() {
   }
   else if (visualSelector.value() == "Rainbow"){
     visualizer = 2
+  }
+  else if (visualSelector.value() == "Disparity Circle"){
+    visualizer = 3
   }
   background(56);
   push()
@@ -500,6 +527,9 @@ function draw() {
       fill(values[i]*255/height+off, values[i]*255/height+off, values[i]*255/height+off)
       rect(i*w, 90, w, height)
     }
+  }
+  else if (visualizer == 3){
+    
   }
 
 
