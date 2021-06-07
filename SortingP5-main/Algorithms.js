@@ -13,7 +13,9 @@ let bsy = 200
 async function swap(arr, a, b) {
   states[a] = 1
   states[b] = 1
-  
+  if (a % 1 != 0 || b % 1 !=0){
+    console.log("WTF")
+  }
   await DelayNew()
 
   let temp = arr[a];
@@ -161,6 +163,7 @@ async function quickSort(arr, start, end) {
 }
 async function partition(arr, low, high) {
   let pivot = arr[floor((low+high)/2)]
+
   let i=low-1
   let j=high+1
   showData = "partitioning"
@@ -172,11 +175,15 @@ async function partition(arr, low, high) {
     i++
     while (arr[i] < pivot){
       i++
+      states[i] = 1
+      await DelayNew()
     }
 
     j--
     while (arr[j] > pivot){
       j--
+      states[j] = 1
+      await DelayNew()
     }
     if (i >= j){
       return j
@@ -340,18 +347,6 @@ async function countingSort(arr, size, place){
 
 
 
-  // while (e >= 0 || n < size){
-  //   states[e] = 1
-  //   states[n] = 1
-  //   await sleep(delay)
-  //   states[e] = -1
-  //   states[n] =
-  //   e--
-  //   n++
-  // }
-  
-  //Copy the output array
-  
   for (let i = 0; i < size; i++){
 
     states[i] = 1
@@ -363,11 +358,12 @@ async function countingSort(arr, size, place){
 
   await QuadBuild(output)
 
-  
-
-  
 
 }
+
+
+
+
 
 async function radixSort(arr){
   let size = arr.length
@@ -1428,17 +1424,17 @@ async function binarySearch(a, item,
 }
  
 // Function to sort an array a[] of size 'n'
-async function insertionSortBinary(a, n)
+async function insertionSortBinary(a, s, n)
 {
     let i, loc, j, k, selected;
  
-    for (i = 1; i < n; ++i)
+    for (i = s+1; i < n; ++i)
     {
         j = i - 1;
         selected = a[i];
  
         // find location where selected sould be inseretd
-        loc = await binarySearch(a, selected, 0, j);
+        loc = await binarySearch(a, selected, s, j);
  
         // Move all elements after location to create space
         while (j >= loc)
@@ -1651,4 +1647,249 @@ async function msort(arr, a, len) {
     
 
 
+//BPM Buffered Merge Sort
+
+
+async function shiftBW(array, a, m, b) {
+    while(m > a){await swap(array, --b, --m)};
+  }
+  
+  async function multiSwap(array, a, b, len) {
+    for(let i = 0; i < len; i++)
+      await swap(array, a+i, b+i);
+  }
+    
+    async function rotateBPM(array, a, m, b) {
+        let l = m-a
+        let r = b-m;
+    
+        while(l > 0 && r > 0) {
+      if(r < l) {
+        await multiSwap(array, m-r, m, r);
+        b -= r;
+        m -= r;
+        l -= r;
+            }
+            else {
+        await multiSwap(array, a, m, l);
+        a += l;
+        m += l;
+        r -= l;
+            }
+        }
+    }
+  
+  async function inPlaceMerge(array, a, m, b) {
+    let i = a, j = m, k;
+    while(i < j && j < b) {
+      if(array[i] > array[j]) {
+        k = j;
+        while(++k < b && array[i] > array[k]){;
+        
+        await rotateBPM(array, i, j, k);
+        }
+        i += k-j;
+        j = k;
+
+      } 
+      else i++;
+    }
+  }
+  
+  async function medianOfThree(array, a, b) {
+    let m = a+floor((b-1-a)/2);
+    if(array[a] > array[m])
+      await swap(array, a, m);
+    
+    if(array[m] > array[b-1]) {
+      await swap(array, m, b-1);
+      
+      if(array[a] > array[m])
+        return;
+    }
+    
+    await swap(array, a, m);
+  }
+  
+  //lite version
+  async function medianOfMedians(array, a, b, s) {
+    let end = b
+    let start = a
+    let i = 0
+    let j = 0;
+    let ad = true;
+    
+    while(end - start > 1) {
+      j = start;
+      for(i = start; i+2*s <= end; i+=s) {
+        i = floor(i)
+        await insertSort(array, i, i+s);
+        await swap(array, j++, floor(i+s/2));
+      }
+      if(i < end) {
+        await insertSort(array, i, end);
+        await swap(array, j++, floor(i+(end-(ad ? 1 : 0)-i)/2));
+        if((end-i)%2 == 0) ad = !ad;
+      }
+      end = j;
+    }
+  }
+  
+  async function partitionBPM(array, a, b) {
+        let i = a
+        let j = b;
+        states[a] = 1
+        while(true) {
+          do {
+            i++;
+            states[i] = 1
+            await DelayNew()
+                  
+          }
+          while(i < j && array[i] > array[a]);
+          
+          do {
+            j--;
+            states[j] = 1
+            await DelayNew()
+          }
+            while(j >= i && array[j] < array[a]){;
+        
+            if(i < j) {
+              await swap(array, i, j)
+            }
+            else      {
+              return j
+            }
+          }
+        } 
+    }
+  
+  async function quickSelect(array, a, b, m) {
+    let badPartition = false, mom = false;
+    let m1 = floor((m+b+1)/2);
+    
+    while(true) {
+      if(badPartition) {
+        await medianOfMedians(array, a, b, 5);
+        mom = true;
+      }
+      else await medianOfThree(array, a, b);
+      
+      let p = await partitionBPM(array, a, b);
+      await swap(array, a, p);
+      
+      let l = Math.max(1, p-a);
+      let r = Math.max(1, b-(p+1));
+      badPartition = !mom && (l/r >= 16 || r/l >= 16);
+      if(p >= m && p < m1) return p;
+      else if(p < m) a = p+1;
+      else           b = p;
+    }
+  }
+  
+  async function mergeBPM(array, a, m, b, p) {
+    let i = a
+    let j = m;
+    
+    while(i < m && j < b) {
+      if(array[i] <= array[j])
+        await swap(array, p++, i++);
+      else 
+        await swap(array, p++, j++);
+    }
+    
+    while(i < m) await swap(array, p++, i++);
+    while(j < b) await swap(array, p++, j++);
+  }
+  
+  async function mergeFW(array, p, a, m, b) {
+    let i = a, j = m;
+    while(i < m && j < b) {
+      if(array[i] <= array[j])
+        await swap(array, p++, i++);
+      else 
+        await swap(array, p++, j++);
+    }
+    
+    if(i < m) return i;
+    else      return j;
+  }
+  
+  async function getMinLevel(n) {
+    while(n >= 32) {n = floor((n+3)/4)};
+    return n;
+  }
+  
+  async function mergeSortBPM(array, a, b, p) {
+    let len = b-a;
+    if(len < 2) return;
+    
+    let i, pos, j = await getMinLevel(len);
+    
+    for(i = a; i+j <= b; i+=j)
+      await insertionSortBinary(array, i, i+j);
+    await insertionSortBinary(array, i, b);
+    
+    while(j < len) {
+      pos = p;
+      for(i = a; i+2*j <= b; i+=2*j, pos+=2*j){
+        //console.log("ee")
+        await mergeBPM(array, floor(i), floor(i+j), floor(i+2*j), floor(pos));
+      }
+      if(i + j < b)
+        await mergeBPM(array, floor(i), floor(i+j), floor(b), floor(pos));
+      else
+        while(i < b) await swap(array, i++, pos++);
+      
+      j *= 2;
+      
+      pos = a;
+      for(i = p; i+2*j <= p+len; i+=2*j, pos+=2*j)
+        await mergeBPM(array, floor(i), floor(i+j), floor(i+2*j), floor(pos));
+      if(i + j < p+len)
+        await mergeBPM(array, floor(i), floor(i+j), floor(p+len), floor(pos));
+      else
+        while(i < p+len) await swap(array, i++, pos++);
+      
+      j *= 2;
+    }
+  }
+  
+  async function BPMsort(array, a, b) {
+    let minLvl = floor(Math.sqrt(b-a));
+    let m = floor((a+b+1)/2);
+    await mergeSortBPM(array, m, b, a);
+    
+    while(m-a > minLvl) {
+      let m1 = floor((a+m+1)/2);
+      m1 = floor(await quickSelect(array, a, m, m1));
+      await mergeSortBPM(array, m1, m, a);
+      
+      let bSize = floor(m1-a);
+      let m2 = floor(Math.min(m1+bSize, b));
+      m1 = floor(await mergeFW(array, a, m1, m, m2));
+      
+      while(m1 < m) {
+        await shiftBW(array, m1, m, m2);
+        m1 = floor(m2-(m-m1));
+        a  = floor(m1-bSize);
+        m  = floor(m2);
+        
+        if(m == b) break;
+        
+        m2 = floor(Math.min(m2+bSize, b));
+        m1 = floor(await mergeFW(array, a, m1, m, m2));
+      }
+      m = floor(m1);
+      a = floor(m1-bSize);
+    }
+    await insertionSortBinary(array, a, m);
+    await inPlaceMerge(array, a, m, b);
+    await insertionSortBinary(array, a, b);
+  }
+    
+    async function BPM(array, length) {
+      await BPMsort(array, 0, length);
+    }
 
