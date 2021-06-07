@@ -13,6 +13,7 @@ let delDown
 var osc
 let sorted
 let shuffType
+let canShuff = true
 let n
 let muted
 let mute
@@ -53,7 +54,7 @@ function setup() {
   selection.option('Tim Sort');
   selection.option('Radix Sort Base 4');
   selection.option('Radix Sort Base 8');
-  selection.option('Radix Sort Base 10');
+  selection.option('Radix Sort Base 12');
 
   selection.option('Insertion Sort');
   selection.option('Selection Sort');
@@ -75,7 +76,8 @@ function setup() {
   shuffType.option("Heapifyed Shuffle")
   shuffType.option("Almost Sorted")
   shuffType.option("Quick Sort Killer")
-  shuffType.option("Sine Wave")
+  shuffType.option("Loppy Sine Wave")
+  shuffType.option("Dual Sine Wave")
   shuffType.option("Mountain")
   shuffType.option("Scrambled Tail")
   shuffType.option("Scrambled Head")
@@ -164,6 +166,8 @@ function getBaseLog(x, y) {
 }
 async function shuffleArr(arr, e, x){
   if (!x){
+    userStartAudio();
+    canRun = false
     for (var i=0;i<e;i++){
       let a = i
       let b = round(random(i, arr.length-1))
@@ -172,7 +176,12 @@ async function shuffleArr(arr, e, x){
       let temp = arr[i];
       arr[a] = arr[b];
       arr[b] = temp;
+      states[a] = 1
+      states[b] = 1
+      let key = (map(arr[i], 1, height, 1, 41))
+      playNote(key+40) 
     }
+    canRun = true
   }
   if (x){
     for (var i=0;i<e;i++){
@@ -189,124 +198,132 @@ async function shuffleArr(arr, e, x){
 }
 
 async function makeVals(){
-  showData = "Shuffling"
-  canRun = true
-  for (var i=0;i<states.length;i++){
-      states[i] = -1
-    }
-  osc.fade(0, 0.1)
-  let item = shuffType.value()
-  for (var i=0;i<states.length;i++){
+  if (canShuff){
+    showData = "Shuffling"
+    canRun = true
+    for (var i=0;i<states.length;i++){
         states[i] = -1
       }
-    values = new Array(floor(width/w));
-    for (let i = 0; i < values.length; i++) {
-      values[i] = round(i*(height-90)/values.length)
-      //values[i] = height-i*height/values.length
-      states[i] = -1;
-    }
-    n = values.length
-
-    if (values.length % 2 != 0){
-    values.splice(values.length-1, 1)
-  }
-
-  if (item == "Reverse Shuffle"){
-    
-    values = values.reverse()
-  }
-
-  if (item == "Normal Shuffle"){
-    shuffleArr(values, values.length, false)
-  }
-
-  if (item == "Heapifyed Shuffle"){
-    let n = values.length
-    for (let i = n / 2 - 1; i >= 0; i--){
-        heapify(values, n, i);
-        //await sleep(1)
-
-    }
-  }
-  if (item == "Almost Sorted"){
-    shuffleArr(values, round(values.length/10), true)
-  }
-
-  if (item == "Scrambled Head"){
-    for (var i=0;i<floor(values.length/5);i++){
-      let a = i
-      let b = round(random(i, floor(values.length/5)))
-      if (i % 5 == 0){
-      }
-
-      let temp = values[i];
-      values[a] = values[b];
-      values[b] = temp;
-
-    }
-  }
-  if (item == "Scrambled Tail"){
-    for (var i=values.length-floor(values.length/5);i<values.length;i++){
-      let a = i
-      let b = round(random(i, values.length-1))
-      if (i % 5 == 0){
-      }
-
-      let temp = values[a];
-      values[a] = values[b];
-      values[b] = temp;
-
-    }
-
-    
-  }
-
-  if (item == "Final Radix Pass"){
-      noDel = true
-      let size = values.length
-      let MAX = max(...values);
-      let b = 4
-      for(let i = 1; parseInt(MAX / i) > 2; i *= b){
-        await countingSort(values, size, i); 
-        console.log(parseInt(MAX/i))
-      }
-      noDel = false
-    }
-
-
-  if (item == "Mountain"){
-    var newArr = [...values]
-    newArr.reverse()
-    for (var i=floor(values.length/2);i<values.length;i++){
-      values[i] = newArr[i]
-    }
-    for (var i=0;i<values.length;i++){
-      values[i] = values[i]*2
-    }
-  }
-
-  if (item == "Sine Wave"){
-    for (var i=0;i<values.length;i++){
-      values[i] = round(sin(i/(values.length/10)) * ((height-90)/3) + (height-90)/2)
-      if (i % 5 == 0){
-        //await sleep(1)
-      }
-    }
-  }
-
-  if (item == "Quick Sort Killer"){
-    let currl = values.length-1
-     for (var j=currl-currl%2-2, i=j;i>=0;i-=2,j--){
-        swap(values, i, j)
-        if (values[i] == 0){
-          
+    osc.fade(0, 0.1)
+    let item = shuffType.value()
+    for (var i=0;i<states.length;i++){
+          states[i] = -1
         }
-        //console.log(values[i], i)
-     } 
-     //console.log(values[floor((values.length-1)/2)])
+      values = new Array(floor(width/w));
+      for (let i = 0; i < values.length; i++) {
+        values[i] = round(i*(height-90)/values.length)
+        //values[i] = height-i*height/values.length
+        states[i] = -1;
+      }
+      n = values.length
+
+      if (values.length % 2 != 0){
+      values.splice(values.length-1, 1)
+    }
+
+    if (item == "Reverse Shuffle"){
+      
+      values = values.reverse()
+    }
+
+    if (item == "Normal Shuffle"){
+      shuffleArr(values, values.length, false)
+    }
+
+    if (item == "Heapifyed Shuffle"){
+      let n = values.length
+      for (let i = n / 2 - 1; i >= 0; i--){
+          heapify(values, n, i);
+          //await sleep(1)
+
+      }
+    }
+    if (item == "Almost Sorted"){
+      shuffleArr(values, round(values.length/10), true)
+    }
+
+    if (item == "Scrambled Head"){
+      for (var i=0;i<floor(values.length/5);i++){
+        let a = i
+        let b = round(random(i, floor(values.length/5)))
+        if (i % 5 == 0){
+        }
+
+        let temp = values[i];
+        values[a] = values[b];
+        values[b] = temp;
+
+      }
+    }
+    if (item == "Scrambled Tail"){
+      for (var i=values.length-floor(values.length/5);i<values.length;i++){
+        let a = i
+        let b = round(random(i, values.length-1))
+        if (i % 5 == 0){
+        }
+
+        let temp = values[a];
+        values[a] = values[b];
+        values[b] = temp;
+
+      }
+
+      
+    }
+
+    if (item == "Final Radix Pass"){
+        noDel = true
+        let size = values.length
+        let MAX = max(...values);
+        let b = 4
+        for(let i = 1; parseInt(MAX / i) > 2; i *= b){
+          await countingSort(values, size, i); 
+        }
+        noDel = false
+      }
+
+
+    if (item == "Mountain"){
+      var newArr = [...values]
+      newArr.reverse()
+      for (var i=floor(values.length/2);i<values.length;i++){
+        values[i] = newArr[i]
+      }
+      for (var i=0;i<values.length;i++){
+        values[i] = values[i]*2
+      }
+    }
+
+    if (item == "Loppy Sine Wave"){
+      for (var i=0;i<values.length;i++){
+        values[i] = round(sin((i+values.length/10)/(values.length/5)) * ((height-90)/2) + (height-90)/2)
+        if (i % 5 == 0){
+          //await sleep(1)
+        }
+      }
+    }
+    if (item == "Dual Sine Wave"){
+      for (var i=0;i<values.length;i++){
+        values[i] = round(sin(i/(values.length/10)) * ((height-90)/3) + (height-90)/2)
+        if (i % 5 == 0){
+          //await sleep(1)
+        }
+      }
+    }
+
+    if (item == "Quick Sort Killer"){
+      let currl = values.length-1
+       for (var j=currl-currl%2-2, i=j;i>=0;i-=2,j--){
+          swap(values, i, j)
+          if (values[i] == 0){
+            
+          }
+          //console.log(values[i], i)
+       } 
+       //console.log(values[floor((values.length-1)/2)])
+    }
+    osc.fade(0, 0.1)
   }
-  osc.fade(0, 0.1)
-    
 }
 let now = new Date()
 async function Run() {
@@ -324,6 +341,7 @@ async function Run() {
   ew = [...values]
   if (canRun){
     canRun = false
+    canShuff = false
     if (item == "Quick Sort"){
       
       quickSort(values, 0, values.length-1)      
@@ -540,6 +558,7 @@ function draw() {
   }
   if (is_array_sorted(values)){
     showData = "Done"
+    canShuff = true
   }
  
 
