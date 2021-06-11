@@ -10,16 +10,19 @@ let canRun = true;
 let delay = 1
 let delUp
 let delDown
+let time = ""
 var osc
 let sorted
 let shuffType
 let canShuff = true
 let n
 let muted
+let leftRig = false
 let mute
 let showData = ""
 let visualSelector
 let visualizer = 0
+let aux = []
 function mousePressed(){
   
 }
@@ -39,7 +42,7 @@ function setup() {
   selection.option('Quick Sort');
   selection.option('Bubble Sort');
   selection.option('Dual-Pivot Quick Sort');
-  selection.option('Quick-Insertion Sort');
+  //selection.option('Quick-Insertion Sort');
   //selection.option('Quick-Merge Sort');
   selection.option('Andrey Sort');
   selection.option('Buffered Partition Sort');
@@ -124,6 +127,7 @@ function setup() {
   muted.changed(checkED)
   makeVals()
   ew = [...values]
+  aux = [...values]
 }
 function checkED() {
   if (this.checked()) {
@@ -325,6 +329,8 @@ async function makeVals(){
     osc.fade(0, 0.1)
   }
 }
+let scanTime = false
+
 let now = new Date()
 async function Run() {
   nes = 0
@@ -338,10 +344,14 @@ async function Run() {
                                   Math.log(2)));
   userStartAudio();
   let item = selection.value();
+  noDel = false
   ew = [...values]
   if (canRun){
     canRun = false
     canShuff = false
+    scanTime = true
+    aux = [...values]
+
     if (item == "Quick Sort"){
       
       quickSort(values, 0, values.length-1)      
@@ -429,9 +439,8 @@ async function Run() {
 
     }
     if (item == "IntroSort"){
-      await sortDataIntro()
-      await insertSort(values, 0, values.length)
-
+      sortDataIntro(values, values.length-1)
+      
     }
     if (item == "Weave Merge Sort"){
       weaveMergeSort(values, 0, values.length)
@@ -446,6 +455,115 @@ async function Run() {
   }
 
 }
+
+
+
+
+function SearchTime(){
+  noDel = true
+  let item = selection.value()
+  //console.log(is_array_sorted(aux))
+  if (item == "Quick Sort"){
+      quickSort(aux, 0, aux.length-1)      
+    }
+    if (item == "Grail Sort"){
+      grailSort(aux, aux.length)
+    }
+    if (item == "Grail Sort Out-of-Place"){
+      grailSortOut(aux, aux.length)
+    }
+    if (item == "Bubble Sort"){
+      bubbleSort(aux)
+    }
+    if (item == "Bogo Sort"){
+      BogoSort(aux)
+    }
+    if (item == "Less Bogo Sort"){
+      LessBogoSort(aux)
+    }
+    if (item == "Dual-Pivot Quick Sort"){
+      DuelPivotQuickSort(aux, aux.length)
+    }
+    if (item == "Quick-Insertion Sort"){
+      QISort()
+    }
+    if (item == "Buffered Partition Sort"){
+      BPM(aux, aux.length)
+    }
+    if (item == "Quick-Merge Sort"){
+      quickMergeSort(aux, aux.length)
+    }
+    if (item == "Merge-Heap Sort"){
+      mergeHeapSort(aux, aux.length)
+    }
+    if (item == "Merge Sort"){
+      mergeSort(aux, 0, aux.length-1)
+
+    }
+    if (item == "Andrey Sort"){
+      msort(aux, 0, aux.length)
+
+    }
+    if (item == "Weaved Merge Sort"){
+      let tmp = new Array(aux.length)
+      WeavedMerge(aux, tmp, aux.length, 0, 1)
+    }
+    if (item == "Bitonic Merge Sort"){
+      let b = true
+      BitonicSort(aux, aux.length-1, b)
+    }
+    if (item == "Tim Sort"){
+      timSort(aux, aux.length)
+    }
+
+    if (item == "Radix Sort Base 4"){
+      base = 4
+      radixSort(aux)
+    }
+    if (item == "Radix Sort Base 8"){
+      base = 8
+      radixSort(aux)
+    }
+    if (item == "Radix Sort Base 12"){
+      base = 12
+      radixSort(aux)
+    }
+    if (item == "Insertion Sort"){
+      insertionSortRecursive(aux, aux.length)
+
+    }
+    if (item == "Selection Sort"){
+      selectionSort(aux, aux.length)
+
+    }
+    if (item == "Heap Sort"){
+      heapSort(aux, aux.length)
+
+    }
+    if (item == "Shell Sort"){
+      ShellSort(aux, aux.length)
+
+    }
+    if (item == "Comb Sort"){
+      combSort(aux)
+
+    }
+    if (item == "IntroSort"){
+      sortDataIntro(aux, aux.length-1)
+      
+    }
+    if (item == "Weave Merge Sort"){
+      weaveMergeSort(aux, 0, aux.length)
+    }
+    if (item == "Shaker Merge Sort"){
+      shakerMergeSort(aux, 0, aux.length)
+    }
+    if (item == "Gravity Sort"){
+      GravitySort(aux, 0, aux.length)
+    }
+}
+
+
 
 function draw() {
   // put drawing code here
@@ -476,6 +594,7 @@ function draw() {
   text("Shuffle", 480, 50)
   text("Start", 890, 50)
   text("Mute Sound", 1030, 50)
+  text("Time Taken: "+time, 1300, 50)
   text("Visualizer", 720, 50)
   //text(showData, 1100, 50)
   pop()
@@ -556,13 +675,27 @@ function draw() {
     osc.fade(0, 0.1)
     
   }
-  if (is_array_sorted(values)){
+  if (is_array_sorted(values) && scanTime){
     showData = "Done"
     canShuff = true
+    noDel = true
+    scanTime = false
+    now = new Date()
+    leftRig = true
+    SearchTime()
+
   }
- 
+  if (is_array_sorted(aux) && leftRig){
+    console.log(new Date()-now)
+    time = new Date()-now
+    scanTime = false
+    leftRig = false
+    //noDel = false
 
-
+  }
 
 
 }
+
+
+
