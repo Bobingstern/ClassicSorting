@@ -162,7 +162,8 @@ async function quickSort(arr, start, end) {
 
 }
 async function partition(arr, low, high) {
-  let pivot = arr[floor((low+high)/2)]
+  let p = floor((low+high)/2)
+  let pivot = arr[p]
 
   let i=low-1
   let j=high+1
@@ -176,6 +177,7 @@ async function partition(arr, low, high) {
     while (arr[i] < pivot){
       i++
       states[i] = 1
+      states[p] = 1
       await DelayNew()
     }
 
@@ -183,6 +185,7 @@ async function partition(arr, low, high) {
     while (arr[j] > pivot){
       j--
       states[j] = 1
+      states[p] = 1
       await DelayNew()
     }
     if (i >= j){
@@ -280,27 +283,27 @@ async function timSort(arr, n)
 //Radix Sort
 let base = 4
 
-async function QuadBuild(output){
+async function QuadBuild(arr, output){
   let counters = []
   let countersOriginal = []
   showData = "Build\nArray"
-  counters[0] = ceil((values.length-1)/base)
+  counters[0] = ceil((arr.length-1)/base)
   for (var i=1;i<base;i++){
-    counters[i] = counters[i-1] + ceil((values.length-1)/base)
+    counters[i] = counters[i-1] + ceil((arr.length-1)/base)
   }
-  counters[base-1] = values.length
+  counters[base-1] = arr.length
   countersOriginal = [...counters]
   let c = 1
   while(counters[0] > 0){
     counters[0]--
     states[counters[0]] = 1
-    values[counters[0]] = output[counters[0]]
+    arr[counters[0]] = output[counters[0]]
     for (var j=0;j<counters.length;j++){
 
       if (counters[j] > 0 && counters[j] >= countersOriginal[j-1]){
         counters[j]--
         states[counters[j]] = 1
-        values[counters[j]] = output[counters[j]]
+        arr[counters[j]] = output[counters[j]]
         await DelayNew()
       }
     }
@@ -356,7 +359,7 @@ async function countingSort(arr, size, place){
     
   }
 
-  await QuadBuild(output)
+  await QuadBuild(arr, output)
 
 
 }
@@ -435,31 +438,7 @@ async function heapify(arr, n, i){
         await heapify(arr, n, largest);
     }
 }
-async function heapifyShuffle(arr, n, i){
 
-    let largest = i; // Initialize largest as root
-    let l = 2 * i + 1; // left = 2*i + 1
-    let r = 2 * i + 2; // right = 2*i + 2
- 
-    // If left child is larger than root
-    if (l < n && arr[l] > arr[largest]){
-        largest = l;
-    }    
- 
-    // If right child is larger than largest so far
-    if (r < n && arr[r] > arr[largest]){
-        largest = r;
-    }
- 
-    // If largest is not root
-    if (largest != i) {
-        await swap(arr, i, largest);
-        states[i] = 0
- 
-        // Recursively heapify the affected sub-tree
-        await heapifyShuffle(arr, n, largest);
-    }
-}
 
 async function heapSort(arr, n)
 {
@@ -757,7 +736,8 @@ async function GravitySort(arr, l, h){
 
 
 async function partitionQuickInsert(arr, low, high) {
-  let pivot = arr[low]
+  let p = floor((low+high)/2)
+  let pivot = arr[p]
   let i=low-1
   let j=high+1
   if (high-low < 10){
@@ -771,11 +751,17 @@ async function partitionQuickInsert(arr, low, high) {
     i++
     while (arr[i] < pivot){
       i++
+      states[i] = 1
+      states[p] = 1
+      await DelayNew()
     }
 
     j--
     while (arr[j] > pivot){
       j--
+      states[j] = 1
+      states[p] = 1
+      await DelayNew()
     }
     if (i >= j){
       return j
@@ -835,173 +821,122 @@ async function QuickInsert(arr, start, end){
  
     // To maxHeap a subtree rooted with node i which is
     // an index in a[]. heapN is size of heap
-    async function maxHeap(i, heapN, begin)
+    async function maxHeap(array, i, heapN, begin)
     {
-        let temp = values[begin + i - 1];
+        let temp = array[begin + i - 1];
         let child;
  
         while (i <= floor(heapN / 2)) {
             child = 2 * i;
  
-            if (child < heapN && values[begin + child - 1] < values[begin + child]){
+            if (child < heapN && array[begin + child - 1] < array[begin + child]){
                 child++;
             }
  
-            if (temp >= values[begin + child - 1]){
+            if (temp >= array[begin + child - 1]){
                 break;
             }
  
-            values[begin + i - 1] = values[begin + child - 1];
+            array[begin + i - 1] = array[begin + child - 1];
             await DelayNew()
             i = child;
         }
-        values[begin + i - 1] = temp;
+        array[begin + i - 1] = temp;
     }
  
     // Function to build the heap (rearranging the array)
-    async function Heapify(begin, end, heapN)
+    async function Heapify(array, begin, end, heapN)
     {
         for (let i = floor((heapN) / 2); i >= 1; i--){
-            await maxHeap(i, heapN, begin);
+            await maxHeap(array, i, heapN, begin);
         }
     }
  
     // main function to do heapsort
-    async function HeapSort(begin, end)
+    async function HeapSort(array, begin, end)
     {
         let heapN = end - begin;
  
         // Build heap (rearrange array)
-        await Heapify(begin, end, heapN);
+        await Heapify(array, begin, end, heapN);
  
         // One by one extract an element from heap
         for (let i = heapN; i >= 1; i--) {
  
             // Move current root to end
-            await swap(values, begin, begin + i);
+            await swap(array, begin, begin + i);
  
             // call maxHeap() on the reduced heap
-            await maxHeap(1, i, begin);
+            await maxHeap(array, 1, i, begin);
         }
     }
  
-    // function that implements insertion sort
-    async function insertionSortIntro(left, right)
-    {
- 
-        for (let i = left; i <= right; i++) {
-            let key = values[i];
-            let j = i;
- 
-            // Move elements of arr[0..i-1], that are
-            // greater than the key, to one position ahead
-            // of their current position
-            while (j > left && values[j - 1] > key) {
-              states[j] = 1
-                values[j] = values[j - 1];
-                await DelayNew()
-                j--;
+  async function floorLogBaseTwo(a) {
+        return floor(Math.floor(Math.log(a) / Math.log(2)));
+    }
+    
+    // Swaps the median of arr[left], arr[mid], and arr[right] to index left.
+    // taken from gcc source code found here: https://gcc.gnu.org/onlinedocs/gcc-4.7.2/libstdc++/api/a01462_source.html
+    async function gccmedianof3(arr, left, mid, right) {
+        if (arr[left] < arr[mid]) {
+            if (arr[mid] < arr[right]) {
+                await swap(arr, left, mid);
             }
-            values[j] = key;
-            await DelayNew()
-        }
-    }
- 
-    // Function for finding the median of the three elements
-    async function findPivot(a1, b1, c1)
-    {
-        let max = Math.max(Math.max(values[a1], values[b1]), values[c1]);
-        let min = Math.min(Math.min(values[a1], values[b1]), values[c1]);
-        let median = max ^ min ^ values[a1] ^ values[b1] ^ values[c1];
-        if (median == values[a1]){
-            return a1;
-        }
-        if (median == values[b1]){
-            return b1;
-        }
-        return c1;
-    }
- 
-    // This function takes the last element as pivot, places
-    // the pivot element at its correct position in sorted
-    // array, and places all smaller (smaller than pivot)
-    // to the left of the pivot
-    // and greater elements to the right of the pivot
-    async function Partition(low, high)
-    {
- 
-        // pivot
-         let pivot = values[high];
- 
-        // Index of smaller element
-        let i = (low - 1);
-        for (let j = low; j <= high - 1; j++) {
- 
-            // If the current element is smaller
-            // than or equal to the pivot
-            if (values[j] <= pivot) {
- 
-                // increment index of smaller element
-                i++;
-                await swap(values, i, j);
+            else if (arr[left] < arr[right]) {
+                await swap(arr, left, right);
             }
         }
-        await swap(values, i + 1, high);
-        return (i + 1);
-
-        
-
-      
+        else if (arr[left] < arr[right]) {
+            middle = left;
+            states[left] = 1
+            return arr[left];
+        }
+        else if (arr[mid] < arr[right]) {
+            await swap(arr, left, right);
+        }
+        else {
+            await swap(arr, left, mid);
+        }
+        middle = left;
+        states[left] = 1
+        return arr[left];
     }
- 
-    // The main function that implements Introsort
-    // low  --> Starting index,
-    // high  --> Ending index,
-    // depthLimit  --> recursion level
-    async function sortDataUtil(begin, end, depthLimit)
-    {
-        if (end - begin > 10) {
+    
+    async function medianof3(arr, left, mid, right) {
+        if(arr[right] < arr[left]) {
+            await swap(arr, left, right); 
+        }
+        if(arr[mid] < arr[left]) {
+            await swap(arr, mid, left);
+        }
+        if(arr[right] < arr[mid]) {
+            await swap(arr, right, mid);
+        }
+        middle = mid;
+        states[mid] = 1
+        return arr[mid];
+    }
+    
+    
+    let sizeThresh = 16
+    async function introsortLoop (a, lo, hi, depthLimit) {
+        while (hi - lo > sizeThresh) {
             if (depthLimit == 0) {
- 
-                // if the recursion limit is
-                // occurred call heap sort
-                await HeapSort(begin, end);
+                await HeapSort(a, lo, hi)
                 return;
             }
- 
-            depthLimit = depthLimit - 1;
-            let pivot = await findPivot(begin, begin + floor((end - begin) / 2) + 1,
-                                           end);
-            await swap(values, pivot, end);
- 
-            // p is partitioning index,
-            // arr[p] is now at right place
-            let p = await Partition(begin, end);
- 
-            // Separately sort elements before
-            // partition and after partition
-            await sortDataUtil(begin, p - 1, depthLimit);
-            await sortDataUtil(p + 1, end, depthLimit);
+            depthLimit--;
+            let p = await partition(a, lo, hi);
+            await introsortLoop(a, p+1, hi, depthLimit);
+            hi = p;
         }
- 
-        else {
-            // if the data set is small,
-            // call insertion sort
-            await insertionSortIntro(begin, end);
-        }
+        return;
     }
- 
-    // A utility function to begin the
-    // Introsort module
-    async function sortDataIntro()
-    {
- 
-        // Initialise the depthLimit
-        // as 2*log(length(data))
-        let depthLimit = floor(2 * Math.floor(Math.log(n) /
-                                  Math.log(2)));
- 
-        await sortDataUtil(0, n - 1, depthLimit);
+    
+    async function sortDataIntro(array, length) {
+
+        await introsortLoop(array, 0, length, 2 * await floorLogBaseTwo(length));
+        await insertSort(array, 0, length+1)
     }
 
 //Quick-Merge Sort
@@ -1143,6 +1078,8 @@ async function mergeHeapSort(arr, n)
             else if(array[k] > pivot2 == 1) {
                 while(k < great && array[great] > pivot2) {
                     great--;
+                    await DelayNew()
+                    states[great] = 1
                 }
                 await swap(array, k, great--);
                 
